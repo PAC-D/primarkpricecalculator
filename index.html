@@ -239,8 +239,13 @@
                 <span class="result-value" id="rebate">-</span>
             </div>
             <div class="result-item" id="pacdRow" style="display: none;">
-                <span class="result-label">5% For PacD:</span>
+                <span class="result-label">For PacD:</span>
                 <span class="result-value" id="pacd">-</span>
+            </div>
+            
+            <div class="result-item" id="supplierPriceRow" style="display: none;">
+                <span class="result-label">Price For Packaging Supplier:</span>
+                <span class="result-value" id="supplierPrice">-</span>
             </div>
             <div id="customMessage" class="custom-message" style="display: none;">
                 Please contact packaging supplier for pricing
@@ -383,6 +388,7 @@
                 return;
             }
             
+            // Sheet Calculations
             const L = (length + width) * 2 + 15;
             const W = (width + height) - 10;
             const areaPerCarton = (L * W * 1.1) / 1000000;
@@ -400,6 +406,7 @@
                 document.getElementById('totalPriceRow').style.display = 'none';
                 document.getElementById('rebateRow').style.display = 'none';
                 document.getElementById('pacdRow').style.display = 'none';
+                document.getElementById('supplierPriceRow').style.display = 'none'; // Hide new row
                 document.getElementById('customMessage').style.display = 'block';
             } else {
                 const unitPrice = cartonData[selection].price;
@@ -411,15 +418,22 @@
                 const pacdPercent = flute === 'bc-flute' ? 0.05 : 0.10;
                 const pacd = (totalPrice - rebate) * pacdPercent;
                 
+                // NEW CALCULATION ADDED HERE
+                const supplierPrice = totalPrice - rebate - pacd;
+                
                 document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
                 document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
                 document.getElementById('rebate').textContent = '$' + rebate.toFixed(2) + ' (' + (rebatePercent * 100) + '%)';
                 document.getElementById('pacd').textContent = '$' + pacd.toFixed(2) + ' (' + (pacdPercent * 100) + '%)';
                 
+                // NEW RESULT DISPLAY ADDED HERE
+                document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
+                
                 document.getElementById('unitPriceRow').style.display = 'flex';
                 document.getElementById('totalPriceRow').style.display = 'flex';
                 document.getElementById('rebateRow').style.display = 'flex';
                 document.getElementById('pacdRow').style.display = 'flex';
+                document.getElementById('supplierPriceRow').style.display = 'flex'; // Show new row
                 document.getElementById('customMessage').style.display = 'none';
             }
             
