@@ -40,9 +40,9 @@
             font-family: 'Outfit', sans-serif;
             background-color: #f1f5f9;
             background-image:
-                    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-                    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
-                    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
             background-size: 100% 100%;
             background-attachment: fixed;
             min-height: 100vh;
@@ -352,421 +352,408 @@
 </head>
 
 <body>
-<div class="calculator-container">
-    <h1>Carton Price Calculator</h1>
-    <h3>Only for Bangladesh (Packaging Supplier Management)</h3>
+    <div class="calculator-container">
+        <h1>Carton Price Calculator</h1>
+        <h3>Only for Bangladesh (Packaging Supplier Management)</h3>
 
-    <div class="form-group">
-        <label for="flute">Flute Type</label>
-        <select id="flute" onchange="updateCartonStyle()">
-            <option value="">Select Flute Type</option>
-            <option value="c-flute">C-Flute</option>
-            <option value="bc-flute">BC-Flute</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="flute">Flute Type</label>
+            <select id="flute" onchange="updateCartonStyle()">
+                <option value="">Select Flute Type</option>
+                <option value="c-flute">C-Flute</option>
+                <option value="bc-flute">BC-Flute</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label for="cartonStyle">Carton Style</label>
-        <select id="cartonStyle" onchange="updateCartonSelection()" disabled>
-            <option value="">Select Carton Style</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="cartonStyle">Carton Style</label>
+            <select id="cartonStyle" onchange="updateCartonSelection()" disabled>
+                <option value="">Select Carton Style</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label for="cartonSelection">Carton Selection</label>
-        <select id="cartonSelection" onchange="updateDimensions()" disabled>
-            <option value="">Select Carton</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="cartonSelection">Carton Selection</label>
+            <select id="cartonSelection" onchange="updateDimensions()" disabled>
+                <option value="">Select Carton</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label>Dimensions (mm)</label>
-        <div class="dimension-group">
-            <div>
-                <label for="length">Length (L)</label>
-                <input type="number" id="length" placeholder="L" min="0" disabled>
+        <div class="form-group">
+            <label>Dimensions (mm)</label>
+            <div class="dimension-group">
+                <div>
+                    <label for="length">Length (L)</label>
+                    <input type="number" id="length" placeholder="L" min="0" disabled>
+                </div>
+                <div>
+                    <label for="width">Width (W)</label>
+                    <input type="number" id="width" placeholder="W" min="0" disabled>
+                </div>
+                <div>
+                    <label for="height">Height (H)</label>
+                    <input type="number" id="height" placeholder="H" min="0" disabled>
+                </div>
             </div>
-            <div>
-                <label for="width">Width (W)</label>
-                <input type="number" id="width" placeholder="W" min="0" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Carton Quantity</label>
+            <input type="number" id="quantity" placeholder="Enter quantity" min="1" oninput="checkQuantity()">
+        </div>
+
+        <div class="form-group" id="markingSection" style="display: none;">
+            <label style="color: #b91c1c; font-weight: 700;">Carton Marking (Qty < 100)</label>
+                    <div class="marking-options">
+                        <label class="marking-label">
+                            <input type="radio" name="marking" value="print" checked>
+                            Carton Print (+ $20.00 Set-up Fee)
+                        </label>
+                        <label class="marking-label">
+                            <input type="radio" name="marking" value="label">
+                            Label Print (+ $0.06 per label)
+                        </label>
+                        <label class="marking-label">
+                            <input type="radio" name="marking" value="none">
+                            None (Print at own factory)
+                        </label>
+                    </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">Calculate Price</button>
+
+        <div class="results" id="results">
+            <div class="result-item" id="sheetLengthRow">
+                <span class="result-label">Blank Sheet Length (L):</span>
+                <span class="result-value" id="sheetLength">-</span>
             </div>
-            <div>
-                <label for="height">Height (H)</label>
-                <input type="number" id="height" placeholder="H" min="0" disabled>
+            <div class="result-item" id="sheetWidthRow">
+                <span class="result-label">Blank Sheet Width (W):</span>
+                <span class="result-value" id="sheetWidth">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Area per Carton:</span>
+                <span class="result-value" id="areaPerCarton">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Area:</span>
+                <span class="result-value" id="totalArea">-</span>
+            </div>
+            <div class="result-item" id="unitPriceRow" style="display: none;">
+                <span class="result-label">Unit Price per Carton:</span>
+                <span class="result-value" id="unitPrice">-</span>
+            </div>
+            <div class="result-item" id="totalPriceRow" style="display: none;">
+                <span class="result-label" id="totalPriceLabel">Total Price (LC Price):</span>
+                <span class="result-value" id="totalPrice">-</span>
+            </div>
+
+            <div class="result-item" id="markingPriceRow" style="display: none;">
+                <span class="result-label">Price with Carton Marking (LC Price):</span>
+                <span class="result-value" id="markingPrice">-</span>
+            </div>
+
+            <div class="result-item" id="rebateRow" style="display: none;">
+                <span class="result-label" id="rebateLabel">Rebates for Primark:</span>
+                <span class="result-value" id="rebate">-</span>
+            </div>
+            <div class="result-item" id="pacdRow" style="display: none;">
+                <span class="result-label" id="pacdLabel">For PacD:</span>
+                <span class="result-value" id="pacd">-</span>
+            </div>
+            <div class="result-item" id="supplierPriceRow" style="display: none;">
+                <span class="result-label">Packaging Supplier Price:</span>
+                <span class="result-value" id="supplierPrice">-</span>
+            </div>
+
+            <div id="customMessage" class="custom-message" style="display: none;">
+                Please contact packaging supplier for pricing
             </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="quantity">Carton Quantity</label>
-        <input type="number" id="quantity" placeholder="Enter quantity" min="1" oninput="checkQuantity()">
+    <div class="logo-footer">
+        <img src="Primark-logo.png" alt="Primark Logo">
+        <img src="image_a18ebf.png" alt="PacD Logo">
     </div>
 
-    <div class="form-group" id="markingSection" style="display: none;">
-        <label style="color: #b91c1c; font-weight: 700;">Carton Marking (Qty < 100)</label>
-        <div class="marking-options">
-            <label class="marking-label">
-                <input type="radio" name="marking" value="print" checked>
-                Carton Print (+ $20.00 Set-up Fee)
-            </label>
-            <label class="marking-label">
-                <input type="radio" name="marking" value="label">
-                Label Print (+ $0.06 per label)
-            </label>
-            <label class="marking-label">
-                <input type="radio" name="marking" value="none">
-                None (Print at own factory)
-            </label>
-        </div>
-    </div>
+    <script>
+        const role = 'admin';
 
-    <button class="calculate-btn" onclick="calculate()">Calculate Price</button>
+        const cartonData = {
+            'A1': { L: 495, W: 285, H: null, unitPrice: 0.97 },
+            'A2': { L: 495, W: 285, H: null, unitPrice: 0.88 },
+            'A3': { L: 495, W: 285, H: null, unitPrice: 0.81 },
+            'B1': { L: 595, W: 285, H: null, unitPrice: 1.10 },
+            'B2': { L: 595, W: 285, H: null, unitPrice: 0.99 },
+            'B3': { L: 595, W: 285, H: null, unitPrice: 0.90 },
+            'C1': { L: 595, W: 325, H: null, unitPrice: 1.22 },
+            'C2': { L: 595, W: 325, H: null, unitPrice: 1.10 },
+            'C3': { L: 595, W: 325, H: null, unitPrice: 1.02 },
+            'D1': { L: 595, W: 380, H: null, unitPrice: 1.39 },
+            'D2': { L: 595, W: 380, H: null, unitPrice: 1.27 },
+            'D3': { L: 595, W: 380, H: null, unitPrice: 1.18 }
+        };
 
-    <div class="results" id="results">
-        <div class="result-item" id="sheetLengthRow">
-            <span class="result-label">Blank Sheet Length (L):</span>
-            <span class="result-value" id="sheetLength">-</span>
-        </div>
-        <div class="result-item" id="sheetWidthRow">
-            <span class="result-label">Blank Sheet Width (W):</span>
-            <span class="result-value" id="sheetWidth">-</span>
-        </div>
-        <div class="result-item">
-            <span class="result-label">Area per Carton:</span>
-            <span class="result-value" id="areaPerCarton">-</span>
-        </div>
-        <div class="result-item">
-            <span class="result-label">Total Area:</span>
-            <span class="result-value" id="totalArea">-</span>
-        </div>
-        <div class="result-item" id="unitPriceRow" style="display: none;">
-            <span class="result-label">Unit Price per Carton:</span>
-            <span class="result-value" id="unitPrice">-</span>
-        </div>
-        <div class="result-item" id="totalPriceRow" style="display: none;">
-            <span class="result-label" id="totalPriceLabel">Total Price (LC Price):</span>
-            <span class="result-value" id="totalPrice">-</span>
-        </div>
+        const allResultRows = [
+            'sheetLengthRow', 'sheetWidthRow', 'unitPriceRow', 'totalPriceRow',
+            'markingPriceRow', 'rebateRow', 'pacdRow', 'supplierPriceRow'
+        ];
 
-        <div class="result-item" id="markingPriceRow" style="display: none;">
-            <span class="result-label">Price with Carton Marking (LC Price):</span>
-            <span class="result-value" id="markingPrice">-</span>
-        </div>
-
-        <div class="result-item" id="rebateRow" style="display: none;">
-            <span class="result-label" id="rebateLabel">Rebates for Primark:</span>
-            <span class="result-value" id="rebate">-</span>
-        </div>
-        <div class="result-item" id="pacdRow" style="display: none;">
-            <span class="result-label" id="pacdLabel">For PacD:</span>
-            <span class="result-value" id="pacd">-</span>
-        </div>
-        <div class="result-item" id="supplierPriceRow" style="display: none;">
-            <span class="result-label">Packaging Supplier Price:</span>
-            <span class="result-value" id="supplierPrice">-</span>
-        </div>
-
-        <div id="customMessage" class="custom-message" style="display: none;">
-            Please contact packaging supplier for pricing
-        </div>
-    </div>
-</div>
-
-<div class="logo-footer">
-    <img src="Primark-logo.png" alt="Primark Logo">
-    <img src="image_a18ebf.png" alt="PacD Logo">
-</div>
-
-<script>
-    const role = 'admin';
-
-    const cartonData = {
-        'A1': { L: 495, W: 285, H: null, unitPrice: 0.97 },
-        'A2': { L: 495, W: 285, H: null, unitPrice: 0.88 },
-        'A3': { L: 495, W: 285, H: null, unitPrice: 0.81 },
-        'B1': { L: 595, W: 285, H: null, unitPrice: 1.10 },
-        'B2': { L: 595, W: 285, H: null, unitPrice: 0.99 },
-        'B3': { L: 595, W: 285, H: null, unitPrice: 0.90 },
-        'C1': { L: 595, W: 325, H: null, unitPrice: 1.22 },
-        'C2': { L: 595, W: 325, H: null, unitPrice: 1.10 },
-        'C3': { L: 595, W: 325, H: null, unitPrice: 1.02 },
-        'D1': { L: 595, W: 380, H: null, unitPrice: 1.39 },
-        'D2': { L: 595, W: 380, H: null, unitPrice: 1.27 },
-        'D3': { L: 595, W: 380, H: null, unitPrice: 1.18 },
-        'R-FPA': { L: 495, W: 285, H: null, unitPrice: 1.03 },
-        'R-FPB': { L: 595, W: 285, H: null, unitPrice: 1.03 },
-        'R-FPC': { L: 595, W: 325, H: null, unitPrice: 1.03 },
-        'R-FPD': { L: 595, W: 380, H: null, unitPrice: 1.03 }
-    };
-
-    const allResultRows = [
-        'sheetLengthRow', 'sheetWidthRow', 'unitPriceRow', 'totalPriceRow',
-        'markingPriceRow', 'rebateRow', 'pacdRow', 'supplierPriceRow'
-    ];
-
-    function clearDimensions() {
-        document.getElementById('length').value = '';
-        document.getElementById('width').value = '';
-        document.getElementById('height').value = '';
-        document.getElementById('length').disabled = true;
-        document.getElementById('width').disabled = true;
-        document.getElementById('height').disabled = true;
-    }
-
-    function checkQuantity() {
-        const qty = parseFloat(document.getElementById('quantity').value);
-        const markingSection = document.getElementById('markingSection');
-
-        if (qty && qty < 100) {
-            markingSection.style.display = 'block';
-        } else {
-            markingSection.style.display = 'none';
+        function clearDimensions() {
+            document.getElementById('length').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('height').value = '';
+            document.getElementById('length').disabled = true;
+            document.getElementById('width').disabled = true;
+            document.getElementById('height').disabled = true;
         }
-    }
 
-    function updateCartonStyle() {
-        const flute = document.getElementById('flute').value;
-        const cartonStyleSelect = document.getElementById('cartonStyle');
-        const cartonSelectionSelect = document.getElementById('cartonSelection');
+        function checkQuantity() {
+            const qty = parseFloat(document.getElementById('quantity').value);
+            const markingSection = document.getElementById('markingSection');
 
-        cartonStyleSelect.innerHTML = '<option value="">Select Carton Style</option>';
-        cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
-        cartonSelectionSelect.disabled = true;
-
-        clearDimensions();
-        document.getElementById('results').classList.remove('show');
-
-        if (flute === 'bc-flute') {
-            cartonStyleSelect.innerHTML += '<option value="standard">Standard Carton - Singles</option>';
-            cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
-            cartonStyleSelect.disabled = false;
-        } else if (flute === 'c-flute') {
-            cartonStyleSelect.innerHTML += '<option value="ratio">Ratio Carton</option>';
-            cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
-            cartonStyleSelect.disabled = false;
-        } else {
-            cartonStyleSelect.disabled = true;
+            if (qty && qty < 100) {
+                markingSection.style.display = 'block';
+            } else {
+                markingSection.style.display = 'none';
+            }
         }
-    }
 
-    function updateCartonSelection() {
-        const cartonStyle = document.getElementById('cartonStyle').value;
-        const cartonSelectionSelect = document.getElementById('cartonSelection');
+        function updateCartonStyle() {
+            const flute = document.getElementById('flute').value;
+            const cartonStyleSelect = document.getElementById('cartonStyle');
+            const cartonSelectionSelect = document.getElementById('cartonSelection');
 
-        cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
-        cartonSelectionSelect.disabled = true;
-        clearDimensions();
+            cartonStyleSelect.innerHTML = '<option value="">Select Carton Style</option>';
+            cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
+            cartonSelectionSelect.disabled = true;
 
-        document.getElementById('results').classList.remove('show');
+            clearDimensions();
+            document.getElementById('results').classList.remove('show');
 
-        if (cartonStyle === 'standard') {
-            const options = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'D1', 'D2', 'D3'];
-            options.forEach(opt => {
-                const data = cartonData[opt];
-                const display = `${opt} (${data.L} x ${data.W} mm)`;
-                cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
-            });
-            cartonSelectionSelect.disabled = false;
-        } else if (cartonStyle === 'ratio') {
-            const options = ['R-FPA', 'R-FPB', 'R-FPC', 'R-FPD'];
-            options.forEach(opt => {
-                const data = cartonData[opt];
-                const display = `${opt} (${data.L} x ${data.W} mm)`;
-                cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
-            });
-            cartonSelectionSelect.disabled = false;
-        } else if (cartonStyle === 'custom') {
-            cartonSelectionSelect.innerHTML += '<option value="custom">Custom Carton (Enter dimensions below)</option>';
-            cartonSelectionSelect.disabled = false;
-            cartonSelectionSelect.value = 'custom';
-            updateDimensions();
+            if (flute === 'bc-flute') {
+                cartonStyleSelect.innerHTML += '<option value="standard">Standard Carton - Singles</option>';
+                cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
+                cartonStyleSelect.disabled = false;
+            } else if (flute === 'c-flute') {
+                cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
+                cartonStyleSelect.disabled = false;
+            } else {
+                cartonStyleSelect.disabled = true;
+            }
         }
-    }
 
-    function updateDimensions() {
-        const selection = document.getElementById('cartonSelection').value;
-        const lengthInput = document.getElementById('length');
-        const widthInput = document.getElementById('width');
-        const heightInput = document.getElementById('height');
+        function updateCartonSelection() {
+            const cartonStyle = document.getElementById('cartonStyle').value;
+            const cartonSelectionSelect = document.getElementById('cartonSelection');
 
-        lengthInput.value = '';
-        widthInput.value = '';
-        heightInput.value = '';
+            cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
+            cartonSelectionSelect.disabled = true;
+            clearDimensions();
 
-        if (selection === 'custom') {
-            lengthInput.disabled = false;
-            widthInput.disabled = false;
-            heightInput.disabled = false;
-        } else if (selection && cartonData[selection]) {
-            const data = cartonData[selection];
-            lengthInput.value = data.L || '';
-            widthInput.value = data.W || '';
-            heightInput.value = data.H || '';
+            document.getElementById('results').classList.remove('show');
 
-            const isPredefined = selection && cartonData[selection];
+            if (cartonStyle === 'standard') {
+                const options = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'D1', 'D2', 'D3'];
+                options.forEach(opt => {
+                    const data = cartonData[opt];
+                    const display = `${opt} (${data.L} x ${data.W} mm)`;
+                    cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
+                });
+                cartonSelectionSelect.disabled = false;
+            } else if (cartonStyle === 'custom') {
+                cartonSelectionSelect.innerHTML += '<option value="custom">Custom Carton (Enter dimensions below)</option>';
+                cartonSelectionSelect.disabled = false;
+                cartonSelectionSelect.value = 'custom';
+                updateDimensions();
+            }
+        }
 
-            if (isPredefined) {
-                lengthInput.disabled = true;
-                widthInput.disabled = true;
+        function updateDimensions() {
+            const selection = document.getElementById('cartonSelection').value;
+            const lengthInput = document.getElementById('length');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+
+            lengthInput.value = '';
+            widthInput.value = '';
+            heightInput.value = '';
+
+            if (selection === 'custom') {
+                lengthInput.disabled = false;
+                widthInput.disabled = false;
                 heightInput.disabled = false;
+            } else if (selection && cartonData[selection]) {
+                const data = cartonData[selection];
+                lengthInput.value = data.L || '';
+                widthInput.value = data.W || '';
+                heightInput.value = data.H || '';
+
+                const isPredefined = selection && cartonData[selection];
+
+                if (isPredefined) {
+                    lengthInput.disabled = true;
+                    widthInput.disabled = true;
+                    heightInput.disabled = false;
+                } else {
+                    lengthInput.disabled = true;
+                    widthInput.disabled = true;
+                    heightInput.disabled = true;
+                }
             } else {
                 lengthInput.disabled = true;
                 widthInput.disabled = true;
                 heightInput.disabled = true;
             }
-        } else {
-            lengthInput.disabled = true;
-            widthInput.disabled = true;
-            heightInput.disabled = true;
+
+            document.getElementById('results').classList.remove('show');
         }
 
-        document.getElementById('results').classList.remove('show');
-    }
+        function calculate() {
+            const flute = document.getElementById('flute').value;
+            const cartonStyle = document.getElementById('cartonStyle').value;
+            const selection = document.getElementById('cartonSelection').value;
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const quantity = parseFloat(document.getElementById('quantity').value);
 
-    function calculate() {
-        const flute = document.getElementById('flute').value;
-        const cartonStyle = document.getElementById('cartonStyle').value;
-        const selection = document.getElementById('cartonSelection').value;
-        const length = parseFloat(document.getElementById('length').value);
-        const width = parseFloat(document.getElementById('width').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const quantity = parseFloat(document.getElementById('quantity').value);
-
-        if (!flute || !selection || !length || !width || !height || !quantity || quantity <= 0) {
-            alert('Please fill in all dimensions, select flute/carton, and enter a valid quantity.');
-            return;
-        }
-
-        checkQuantity();
-
-        let L, W, areaPerCarton;
-
-        if (flute === 'bc-flute') {
-            L = (length + width) * 2 + 11;
-            W = (height + width) - 16;
-            areaPerCarton = (L * W) / 1000000;
-
-            if (cartonStyle === 'custom') {
-                areaPerCarton = areaPerCarton * 1.1;
+            if (!flute || !selection || !length || !width || !height || !quantity || quantity <= 0) {
+                alert('Please fill in all dimensions, select flute/carton, and enter a valid quantity.');
+                return;
             }
-        } else if (flute === 'c-flute') {
-            L = (length + width) * 2 + 15;
-            W = (width + height) - 10;
-            areaPerCarton = (L * W * 1.025) / 1000000;
-        } else {
-            alert('Invalid Flute Type selected.');
-            return;
-        }
 
-        const totalArea = areaPerCarton * quantity;
+            checkQuantity();
 
-        document.getElementById('sheetLength').textContent = L.toFixed(2) + ' mm';
-        document.getElementById('sheetWidth').textContent = W.toFixed(2) + ' mm';
-        document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(6) + ' m²';
-        document.getElementById('totalArea').textContent = totalArea.toFixed(6) + ' m²';
-
-        allResultRows.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.style.display = 'none';
-        });
-        document.getElementById('customMessage').style.display = 'none';
-
-        const isCustom = selection === 'custom';
-
-        if (!isCustom) {
-            const priceValue = cartonData[selection].unitPrice;
-            let totalPrice;
+            let L, W, areaPerCarton;
 
             if (flute === 'bc-flute') {
-                totalPrice = quantity * priceValue;
-                document.getElementById('unitPrice').textContent = '$' + priceValue.toFixed(2);
-                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price:';
+                L = (length + width) * 2 + 11;
+                W = (height + width) - 16;
+                areaPerCarton = (L * W) / 1000000;
+
+                if (cartonStyle === 'custom') {
+                    areaPerCarton = areaPerCarton * 1.1;
+                }
             } else if (flute === 'c-flute') {
-                totalPrice = totalArea * priceValue;
-                document.getElementById('unitPrice').textContent = '$' + priceValue.toFixed(2);
-                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price:';
-            }
-
-            const rebatePercent = flute === 'bc-flute' ? 0.05 : 0.10;
-            const rebate = totalPrice * rebatePercent;
-
-            const pacdPercent = flute === 'bc-flute' ? 0.04 : 0.075;
-            const pacd = (totalPrice - rebate) * pacdPercent;
-
-            // Calculate marking cost FIRST
-            let markingCost = 0;
-            if (quantity < 100) {
-                const markingType = document.querySelector('input[name="marking"]:checked').value;
-
-                if (markingType === 'print') {
-                    markingCost = 20.00;
-                } else if (markingType === 'label') {
-                    markingCost = quantity * 0.06;
-                }
-            }
-
-            // THEN calculate supplier price
-            const supplierPrice = totalPrice - rebate - pacd + markingCost;
-
-            // Update labels
-            document.getElementById('rebateLabel').textContent = `Rebates for Primark (${rebatePercent * 100}%):`;
-            document.getElementById('pacdLabel').textContent = `For PacD (${pacdPercent * 100}%):`;
-
-            // Update all price displays
-            document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
-            document.getElementById('rebate').textContent = '$' + rebate.toFixed(2);
-            document.getElementById('pacd').textContent = '$' + pacd.toFixed(2);
-            document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
-
-            // Handle marking price display and update labels
-            let showMarkingRow = false;
-            if (quantity < 100) {
-                const markingType = document.querySelector('input[name="marking"]:checked').value;
-                const priceWithMarking = totalPrice + markingCost;
-                document.getElementById('markingPrice').textContent = '$' + priceWithMarking.toFixed(2);
-
-                if ((role === 'admin' || role === 'garment_supplier') && markingType !== 'none') {
-                    document.getElementById('markingPriceRow').style.display = 'flex';
-                    showMarkingRow = true;
-                }
-            }
-
-            // Update Total Price label based on marking row visibility
-            if (showMarkingRow) {
-                document.getElementById('totalPriceLabel').textContent = 'Total Price:';
+                L = (length + width) * 2 + 15;
+                W = (width + height) - 10;
+                areaPerCarton = (L * W * 1.025) / 1000000;
             } else {
-                document.getElementById('totalPriceLabel').textContent = 'Total Price (LC Price):';
+                alert('Invalid Flute Type selected.');
+                return;
             }
 
-            // Show/hide rows based on role
-            if (role === 'admin') {
-                document.getElementById('unitPriceRow').style.display = 'flex';
-                document.getElementById('totalPriceRow').style.display = 'flex';
-                document.getElementById('rebateRow').style.display = 'flex';
-                document.getElementById('pacdRow').style.display = 'flex';
-                document.getElementById('supplierPriceRow').style.display = 'flex';
-            } else if (role === 'garment_supplier') {
-                document.getElementById('totalPriceRow').style.display = 'flex';
-            } else if (role === 'packaging_supplier') {
-                document.getElementById('supplierPriceRow').style.display = 'flex';
+            const totalArea = areaPerCarton * quantity;
+
+            document.getElementById('sheetLength').textContent = L.toFixed(2) + ' mm';
+            document.getElementById('sheetWidth').textContent = W.toFixed(2) + ' mm';
+            document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(6) + ' m²';
+            document.getElementById('totalArea').textContent = totalArea.toFixed(6) + ' m²';
+
+            allResultRows.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+            document.getElementById('customMessage').style.display = 'none';
+
+            const isCustom = selection === 'custom';
+
+            if (!isCustom || (isCustom && flute === 'c-flute')) {
+                const priceValue = isCustom ? 1.03 : cartonData[selection].unitPrice;
+                let totalPrice;
+
+                if (flute === 'bc-flute') {
+                    totalPrice = quantity * priceValue;
+                    document.getElementById('unitPrice').textContent = '$' + priceValue.toFixed(2);
+                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price:';
+                } else if (flute === 'c-flute') {
+                    totalPrice = totalArea * priceValue;
+                    document.getElementById('unitPrice').textContent = '$' + priceValue.toFixed(2);
+                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price:';
+                }
+
+                const rebatePercent = flute === 'bc-flute' ? 0.05 : 0.10;
+                const rebate = totalPrice * rebatePercent;
+
+                const pacdPercent = flute === 'bc-flute' ? 0.04 : 0.075;
+                const pacd = (totalPrice - rebate) * pacdPercent;
+
+                // Calculate marking cost FIRST
+                let markingCost = 0;
+                if (quantity < 100) {
+                    const markingType = document.querySelector('input[name="marking"]:checked').value;
+
+                    if (markingType === 'print') {
+                        markingCost = 20.00;
+                    } else if (markingType === 'label') {
+                        markingCost = quantity * 0.06;
+                    }
+                }
+
+                // THEN calculate supplier price
+                const supplierPrice = totalPrice - rebate - pacd + markingCost;
+
+                // Update labels
+                document.getElementById('rebateLabel').textContent = `Rebates for Primark (${rebatePercent * 100}%):`;
+                document.getElementById('pacdLabel').textContent = `For PacD (${pacdPercent * 100}%):`;
+
+                // Update all price displays
+                document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
+                document.getElementById('rebate').textContent = '$' + rebate.toFixed(2);
+                document.getElementById('pacd').textContent = '$' + pacd.toFixed(2);
+                document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
+
+                // Handle marking price display and update labels
+                let showMarkingRow = false;
+                if (quantity < 100) {
+                    const markingType = document.querySelector('input[name="marking"]:checked').value;
+                    const priceWithMarking = totalPrice + markingCost;
+                    document.getElementById('markingPrice').textContent = '$' + priceWithMarking.toFixed(2);
+
+                    if ((role === 'admin' || role === 'garment_supplier') && markingType !== 'none') {
+                        document.getElementById('markingPriceRow').style.display = 'flex';
+                        showMarkingRow = true;
+                    }
+                }
+
+                // Update Total Price label based on marking row visibility
+                if (showMarkingRow) {
+                    document.getElementById('totalPriceLabel').textContent = 'Total Price:';
+                } else {
+                    document.getElementById('totalPriceLabel').textContent = 'Total Price (LC Price):';
+                }
+
+                // Show/hide rows based on role
+                if (role === 'admin') {
+                    document.getElementById('unitPriceRow').style.display = 'flex';
+                    document.getElementById('totalPriceRow').style.display = 'flex';
+                    document.getElementById('rebateRow').style.display = 'flex';
+                    document.getElementById('pacdRow').style.display = 'flex';
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                } else if (role === 'garment_supplier') {
+                    document.getElementById('totalPriceRow').style.display = 'flex';
+                } else if (role === 'packaging_supplier') {
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                }
+
+                document.getElementById('results').children[2].style.display = 'flex';
+                document.getElementById('results').children[3].style.display = 'flex';
+
+            } else {
+                document.getElementById('customMessage').style.display = 'block';
+                document.getElementById('results').children[2].style.display = 'flex';
+                document.getElementById('results').children[3].style.display = 'flex';
             }
 
-            document.getElementById('results').children[2].style.display = 'flex';
-            document.getElementById('results').children[3].style.display = 'flex';
+            const showSheetDimensions = role === 'admin';
+            document.getElementById('sheetLengthRow').style.display = showSheetDimensions ? 'flex' : 'none';
+            document.getElementById('sheetWidthRow').style.display = showSheetDimensions ? 'flex' : 'none';
 
-        } else {
-            document.getElementById('customMessage').style.display = 'block';
-            document.getElementById('results').children[2].style.display = 'flex';
-            document.getElementById('results').children[3].style.display = 'flex';
+            document.getElementById('results').classList.add('show');
         }
-
-        const showSheetDimensions = role === 'admin';
-        document.getElementById('sheetLengthRow').style.display = showSheetDimensions ? 'flex' : 'none';
-        document.getElementById('sheetWidthRow').style.display = showSheetDimensions ? 'flex' : 'none';
-
-        document.getElementById('results').classList.add('show');
-    }
-</script>
+    </script>
 </body>
 
 </html>
