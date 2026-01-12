@@ -422,15 +422,15 @@
     </div>
 
     <div class="form-group" id="markingSection" style="display: none;">
-        <label style="color: #b91c1c; font-weight: 700;">Carton Marking (Qty < 100)</label>
+        <label style="color: #b91c1c; font-weight: 700;">Print on Carton (Qty < 100)</label>
         <div class="marking-options">
             <label class="marking-label">
                 <input type="radio" name="marking" value="print" checked>
-                Carton Print (+ $20.00 Set-up Fee)
+                Screen Print ($20.00 Set-up Fee)
             </label>
             <label class="marking-label">
                 <input type="radio" name="marking" value="label">
-                Label Print (+ $0.06 per label)
+                Label Print ($0.06 per label)
             </label>
             <label class="marking-label">
                 <input type="radio" name="marking" value="none">
@@ -477,7 +477,7 @@
             <span class="result-value" id="rebate">-</span>
         </div>
         <div class="result-item" id="pacdRow" style="display: none;">
-            <span class="result-label" id="pacdLabel">Program Management Fee (For Pac-D):</span>
+            <span class="result-label" id="pacdLabel">Program Management Fee For Pac-D:</span>
             <span class="result-value" id="pacd">-</span>
         </div>
         <div class="result-item" id="supplierPriceRow" style="display: none;">
@@ -674,9 +674,6 @@
             L = (length + width) * 2 + 11;
             W = (height + width) - 16;
             areaPerCarton = (L * W) / 1000000;
-            // Previous logic had a 1.1 multiplier for custom BC flute?
-            // Prompt: "if custom then use sqm price (ignore c flute/bc flute)"
-            // I will strictly use the formula for standard area.
         } else if (isCLike) {
             L = (length + width) * 2 + 15;
             W = (width + height) - 10;
@@ -685,18 +682,6 @@
             alert("Invalid Flute selection");
             return;
         }
-
-        // Note: Previous logic applied "areaPerCarton = areaPerCarton * 1.1" for custom BC flute.
-        // But prompt says "if custom then use sqm price".
-        // I'll stick to raw area calculation for consistency unless previously hardcoded logic was vital.
-        // Previous code:
-        // if (flute === 'bc-flute') { ... if (cartonStyle === 'custom') areaPerCarton = areaPerCarton * 1.1; }
-        // Since the user said "ignore c flute/bc flute" for calculation choice (Unit vs SQM),
-        // I'll calculate TRUE area here. Pricing logic handles the surcharge via SQM price if needed.
-        // However, if that 1.1 was a "waste allowance" for custom BC, I should probably keep it?
-        // "if custom then use sqm price" - This refers to the PRICING mechanism.
-        // I'll keep the AREA logic clean (Standard Area formulas) and rely on the SQM Price.
-        // If the user wants the 1.1 allowance back, they can ask. I will act on "use sqm price" instruction.
 
         const totalArea = areaPerCarton * quantity;
 
@@ -788,7 +773,10 @@
         if (role === 'admin') {
             document.getElementById('unitPriceRow').style.display = 'flex';
             document.getElementById('totalPriceRow').style.display = 'flex';
-            document.getElementById('rebateRow').style.display = 'flex';
+            // Only show rebate row if rebate is not zero
+            if (rebate !== 0) {
+                document.getElementById('rebateRow').style.display = 'flex';
+            }
             document.getElementById('pacdRow').style.display = 'flex';
             document.getElementById('supplierPriceRow').style.display = 'flex';
         } else if (role === 'garment_supplier') {
