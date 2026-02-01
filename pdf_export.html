@@ -270,6 +270,13 @@
             const clone = element.cloneNode(true);
             clone.style.transform = 'none';
             clone.style.margin = '0';
+            clone.style.boxShadow = 'none';
+
+            // Force single page dimensions
+            clone.style.minHeight = 'unset';
+            clone.style.height = '296mm'; // Slightly less than 297mm to prevent overflow
+            clone.style.maxHeight = '296mm';
+            clone.style.overflow = 'hidden';
 
             // Create container
             const container = document.createElement('div');
