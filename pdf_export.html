@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Export</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #525659;
+            display: flex;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 20mm;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            /* Reduced from 2rem */
+            border-bottom: 2px solid #00205b;
+            padding-bottom: 0.75rem;
+            /* Reduced from 1rem */
+            padding-left: 1rem;
+            /* Negative internal spacing effect if container is padding 20mm */
+            padding-right: 1rem;
+        }
+
+        .logo {
+            height: 35px;
+            /* Smaller logos */
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Reduce Primark logo specifically */
+        .logo:last-child {
+            height: 28px;
+            /* 0.8 * 35 = 28px */
+        }
+
+
+
+        .content {
+            margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: #e31837;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .grid-row {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .grid-item {
+            flex: 1;
+        }
+
+        /* Dimensions row */
+        .dims-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dim-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Quantity Section */
+        .quantity-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .value {
+            font-size: 1rem;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .cost-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .cost-row.highlight {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #00205b;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20mm;
+            left: 20mm;
+            right: 20mm;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+
+        @media print {
+
+            /* Hide UI elements */
+            #status-bar,
+            #download-btn {
+                display: none !important;
+            }
+
+            /* Reset Page for Print */
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+                display: block;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #page {
+                width: 100%;
+                min-height: auto;
+                margin: 0;
+                padding: 15mm;
+                /* Slightly reduced padding for safe printing */
+                box-shadow: none;
+                border: none;
+            }
+
+            .footer {
+                position: fixed;
+                bottom: 10mm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="status-bar"
+        style="position: fixed; top: 0; left: 0; width: 100%; background: #00205b; color: white; padding: 10px; text-align: center; font-size: 14px; z-index: 1000;">
+        Generating PDF... Please wait.
+    </div>
+
+    <div id="page">
+        <div class="header">
+            <img src="assets/allport-pacd-logo.png" alt="PACD" class="logo">
+            <img src="assets/Primark-logo.png" alt="Primark" class="logo">
+        </div>
+
+
+
+        <div class="content">
+            <div id="specs-container">
+                <!-- Specs injected here -->
+            </div>
+
+            <h2>Dimensions</h2>
+            <div class="dims-row" id="dims-container">
+                <!-- Dims injected here -->
+            </div>
+
+            <div class="quantity-section" id="qty-container">
+                <!-- Qty injected here -->
+            </div>
+
+            <h2>Cost Breakdown</h2>
+            <div class="cost-list" id="costs-container">
+                <!-- Costs injected here -->
+            </div>
+        </div>
+
+        <div class="footer">
+            Generated on <span id="date"></span> using PACD Price Calculator
+        </div>
+    </div>
+
+    <!-- Manual Download Button (Hidden initially) -->
+    <button id="download-btn" onclick="generatePDF()"
+        style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: #e31837; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+        Download PDF Again
+    </button>
+
+    <script>
+        function generatePDF() {
+            const element = document.getElementById('page');
+            const status = document.getElementById('status-bar');
+
+            status.textContent = 'Generating PDF...';
+
+            const opt = {
+                margin: 0,
+                filename: 'PACD-Carton-Price.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0,
+                    scrollX: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Clone the element to render off-screen (prevents scroll/viewport issues)
+            const clone = element.cloneNode(true);
+            clone.style.transform = 'none';
+            clone.style.margin = '0';
+
+            // Create container
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.top = '-9999px';
+            container.style.left = '-9999px';
+            container.style.width = '210mm';
+            container.appendChild(clone);
+            document.body.appendChild(container);
+
+            html2pdf().set(opt).from(clone).save().then(() => {
+                document.body.removeChild(container);
+                status.textContent = 'PDF Downloaded! You can now close this tab.';
+                status.style.background = '#10b981';
+                document.getElementById('download-btn').style.display = 'block';
+            }).catch(err => {
+                console.error(err);
+                document.body.removeChild(container);
+                status.textContent = 'Error generating PDF. Please try manual download.';
+                status.style.background = '#e31837';
+                document.getElementById('download-btn').style.display = 'block';
+            });
+        }
+
+        window.onload = function () {
+            const data = JSON.parse(window.localStorage.getItem('printData'));
+
+            if (!data) {
+                document.body.innerHTML = '<h1 style="color: white; margin-top: 50px; text-align: center;">No data found. Please calculate price first.</h1>';
+                return;
+            }
+
+            document.getElementById('date').textContent = new Date().toLocaleDateString();
+
+            // Specs
+            const specsDiv = document.getElementById('specs-container');
+            let specsHtml = '<h2>Specifications</h2><div class="grid-row">';
+
+            // Row 1
+            specsHtml += `<div class="grid-item"><div class="label">Origin</div><div class="value">${data.specs.origin}</div></div>`;
+            specsHtml += `<div class="grid-item"><div class="label">Flute Type</div><div class="value">${data.specs.flute}</div></div>`;
+            specsHtml += `</div><div class="grid-row">`;
+
+            // Row 2
+            specsHtml += `<div class="grid-item"><div class="label">Carton Style</div><div class="value">${data.specs.cartonStyle}</div></div>`;
+
+            // Conditional Carton Selection
+            if (data.specs.cartonSelection) {
+                specsHtml += `<div class="grid-item"><div class="label">Carton Selection</div><div class="value">${data.specs.cartonSelection}</div></div>`;
+            } else {
+                specsHtml += `<div class="grid-item"></div>`; // Empty filler if needed or just omit
+            }
+
+            specsHtml += `</div>`;
+            specsDiv.innerHTML = specsHtml;
+
+            // Dims (Row - Excludes Quantity)
+            const dimsDiv = document.getElementById('dims-container');
+            dimsDiv.innerHTML = `
+                <div class="dim-box"><div class="label">Length</div><div class="value">${data.dims.length} mm</div></div>
+                <div class="dim-box"><div class="label">Width</div><div class="value">${data.dims.width} mm</div></div>
+                <div class="dim-box"><div class="label">Height</div><div class="value">${data.dims.height} mm</div></div>
+            `;
+
+            // Quantity (Separate)
+            document.getElementById('qty-container').innerHTML = `
+                <div class="label" style="margin-bottom: 0;">Quantity:</div>
+                <div class="value" style="font-size: 1.25rem;">${data.dims.quantity}</div>
+            `;
+
+            // Costs
+            const costsDiv = document.getElementById('costs-container');
+            let costsHtml = '';
+            data.costs.forEach(item => {
+                const cls = item.highlight ? 'cost-row highlight' : 'cost-row';
+                costsHtml += `<div class="${cls}"><span>${item.label}</span><span>${item.value}</span></div>`;
+            });
+            costsDiv.innerHTML = costsHtml;
+
+            // Trigger generation with a slight delay to ensure rendering
+            setTimeout(generatePDF, 800);
+        };
+    </script>
+</body>
+
+</html>
