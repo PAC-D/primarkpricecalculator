@@ -14,10 +14,17 @@ A specialized web application designed for calculating packaging carton prices f
 ### 💰 Intelligent Pricing Engine
 *   **Dynamic Calculations**: Automatically computes Unit Price, Total Area, and Total Price.
 *   **Fee Structure**:
-    *   **Program Management Fee**: Automatically applied at **8%**.
+    *   **Program Management Fee**: Automatically applied at **5%** (calculated from Total Price).
     *   **Rebates**: Configurable rebate logic for Primark.
     *   **SQM Pricing**: Base price set to **$0.85 per m²** for custom dimensions.
 *   **Small Order Logic**: Applies specific marking/printing fees (Screen Print vs. Label) for orders with a **Quantity < 50**.
+*   **SQM Formula**: Uses a universal formula for all flute types including **8% wastage**.
+
+### 🧮 SQM Calculation Formula
+The application uses the following universal formula for all Flute Types (C32, C40, BC40):
+*   **Sheet Length (L)**: `2 × (Length + Width) + 50` (mm)
+*   **Sheet Width (W)**: `(Height + Width) + 50` (mm)
+*   **Area Calculation**: `((L × W) / 1,000,000) × 1.08` *(Includes 8% Wastage factor)*
 
 ### 📄 Professional PDF Export
 *   **Dedicated Print View**: Generates a clean, branded A4 Quote/Estimate using a separate layout engine (`pdf_export.html`).
@@ -41,6 +48,6 @@ A specialized web application designed for calculating packaging carton prices f
 
 ## Recent Updates
 
-*   **Calculation Logic**: Updated Print threshold to < 50 units, Fee to 8%, and SQM Base Price to $0.85.
+*   **Calculation Logic**: Updated Print threshold to < 50 units, Fee to 5%, and implemented universal SQM formula with 8% wastage.
 *   **PDF Export**: Completely overhauled export engine to use a cloned, off-screen renderer for consistent results across devices.
 *   **UI Polish**: Enhanced button alignment and spacing for a better user experience.

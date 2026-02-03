@@ -577,6 +577,35 @@
                 <p>Packaging Supplier Management</p>
             </div>
 
+            <!-- Supplier & Factory Information -->
+            <div class="form-section">
+                <label class="section-label">Supplier & Factory Information</label>
+
+                <!-- Supplier Row -->
+                <div class="input-grid" style="grid-template-columns: 3fr 1fr; margin-bottom: 1rem;">
+                    <div class="form-group floating-group">
+                        <input type="text" id="supplierName" placeholder=" ">
+                        <label for="supplierName">Supplier Name</label>
+                    </div>
+                    <div class="form-group floating-group">
+                        <input type="text" id="supplierCode" placeholder=" ">
+                        <label for="supplierCode">Code</label>
+                    </div>
+                </div>
+
+                <!-- Factory Row -->
+                <div class="input-grid" style="grid-template-columns: 3fr 1fr;">
+                    <div class="form-group floating-group">
+                        <input type="text" id="factoryName" placeholder=" ">
+                        <label for="factoryName">Factory Name</label>
+                    </div>
+                    <div class="form-group floating-group">
+                        <input type="text" id="factoryCode" placeholder=" ">
+                        <label for="factoryCode">Code</label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Origin & Specs -->
             <div class="form-section">
                 <label class="section-label">Specifications</label>
@@ -601,9 +630,9 @@
                     <label class="select-label">Flute Type</label>
                     <select id="flute" class="custom-select" onchange="updateCartonStyle()" disabled>
                         <option value="">Select Flute Type</option>
-                        <option value="C32">C32</option>
-                        <option value="C40">C40</option>
-                        <option value="BC40" id="opt-bc40">BC40</option>
+                        <option value="C32">C Flute (C32 ECT)</option>
+                        <option value="C40">C Flute (C40 ECT)</option>
+                        <option value="BC40" id="opt-bc40">BC Flute (BC40 ECT)</option>
                     </select>
                 </div>
 
@@ -612,7 +641,7 @@
                     <select id="cartonStyle" class="custom-select" onchange="updateCartonSelection()" disabled>
                         <option value="">Select Carton Style</option>
                         <option value="standard">Standard Footprint</option>
-                        <option value="custom">Custom Footprint</option>
+                        <option value="custom">Custom</option>
                     </select>
                 </div>
 
@@ -626,7 +655,7 @@
 
             <!-- Dimensions -->
             <div class="form-section">
-                <label class="section-label">Dimensions (mm)</label>
+                <label class="section-label">Outside Dimension (mm) - FEFCO 0201</label>
                 <div class="input-grid">
                     <div class="form-group floating-group">
                         <input type="number" id="length" placeholder=" " min="0" disabled>
@@ -751,12 +780,17 @@
         </div>
 
         <div class="pdf-content">
+            <h2>Supplier & Factory Information</h2>
+            <div class="pdf-grid" id="pdf-supplier">
+                <!-- Populated via JS -->
+            </div>
+
             <h2>Specifications</h2>
             <div class="pdf-grid" id="pdf-specs">
                 <!-- Populated via JS -->
             </div>
 
-            <h2>Dimensions & Details</h2>
+            <h2>Outside Dimension (mm) - FEFCO 0201</h2>
             <div class="pdf-grid" id="pdf-dims">
                 <!-- Populated via JS -->
             </div>
@@ -949,28 +983,21 @@
 
             let L, W, areaPerCarton;
 
-            const isBcLike = (flute === 'BC40');
-            const isCLike = (flute === 'C32' || flute === 'C40');
+            // Universal Formula for all flute types
+            // L = 2 * (L+W) + 50mm (derived from +0.05m)
+            L = (length + width) * 2 + 50;
+            // W = (H+W) + 50mm (derived from +0.05m)
+            W = (height + width) + 50;
 
-            if (isBcLike) {
-                L = (length + width) * 2 + 11;
-                W = (height + width) - 16;
-                areaPerCarton = (L * W) / 1000000;
-            } else if (isCLike) {
-                L = (length + width) * 2 + 15;
-                W = (width + height) - 10;
-                areaPerCarton = (L * W * 1.025) / 1000000;
-            } else {
-                alert("Invalid Flute selection");
-                return;
-            }
+            // Area in sqm with 8% wastage included
+            areaPerCarton = ((L * W) / 1000000) * 1.08;
 
             const totalArea = areaPerCarton * quantity;
 
             document.getElementById('sheetLength').textContent = L.toFixed(2) + ' mm';
             document.getElementById('sheetWidth').textContent = W.toFixed(2) + ' mm';
-            document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(6) + ' m²';
-            document.getElementById('totalArea').textContent = totalArea.toFixed(6) + ' m²';
+            document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(2) + ' m²';
+            document.getElementById('totalArea').textContent = totalArea.toFixed(2) + ' m²';
 
             // Show Result Rows
             allResultRows.forEach(id => {
@@ -980,79 +1007,87 @@
             document.getElementById('customMessage').style.display = 'none';
 
             // Pricing Logic
+            // Pricing Logic
+            const origin = document.getElementById('origin').value;
+            const skipPrice = (style === 'custom' && origin !== 'Bangladesh');
+
             let totalPrice = 0;
             const SQM_PRICE = 0.85;
 
-            if (style === 'standard') {
-                const unitPrice = cartonData[selection].unitPrice;
-                totalPrice = quantity * unitPrice;
+            if (!skipPrice) {
+                if (style === 'standard') {
+                    const unitPrice = cartonData[selection].unitPrice;
+                    totalPrice = quantity * unitPrice;
 
-                document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
-                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price';
+                    document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
+                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price';
+                } else {
+                    totalPrice = totalArea * SQM_PRICE;
+
+                    document.getElementById('unitPrice').textContent = '$' + SQM_PRICE.toFixed(2);
+                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price';
+                }
+
+                const rebatePercent = 0.00;
+                const pacdPercent = 0.05;
+
+                const rebate = totalPrice * rebatePercent;
+                const pacd = (totalPrice) * pacdPercent;
+
+                let markingCost = 0;
+                if (quantity < 50) {
+                    const markingType = document.querySelector('input[name="marking"]:checked').value;
+                    if (markingType === 'print') {
+                        markingCost = 20.00;
+                    } else if (markingType === 'label') {
+                        markingCost = quantity * 0.06;
+                    }
+                }
+
+                const supplierPrice = totalPrice - rebate - pacd + markingCost;
+
+                document.getElementById('rebateLabel').textContent = `Rebates for Primark (${(rebatePercent * 100).toFixed(0)}%)`;
+                document.getElementById('pacdLabel').textContent = `Program Management Fee (${(pacdPercent * 100).toFixed(0)}%)`;
+
+                document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
+                document.getElementById('rebate').textContent = '$' + rebate.toFixed(2);
+                document.getElementById('pacd').textContent = '$' + pacd.toFixed(2);
+                document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
+
+                let showMarkingRow = false;
+                if (quantity < 50) {
+                    const markingType = document.querySelector('input[name="marking"]:checked').value;
+                    const priceWithMarking = totalPrice + markingCost;
+                    document.getElementById('markingPrice').textContent = '$' + priceWithMarking.toFixed(2);
+
+                    if ((role === 'admin' || role === 'garment_supplier') && markingType !== 'none') {
+                        document.getElementById('markingPriceRow').style.display = 'flex';
+                        showMarkingRow = true;
+                    }
+                }
+
+                if (showMarkingRow) {
+                    document.getElementById('totalPriceLabel').textContent = 'Total Price';
+                } else {
+                    document.getElementById('totalPriceLabel').textContent = 'Total Price (LC Price)';
+                }
+
+                // Role visibility
+                if (role === 'admin') {
+                    document.getElementById('unitPriceRow').style.display = 'flex';
+                    document.getElementById('totalPriceRow').style.display = 'flex';
+                    if (rebate !== 0) {
+                        document.getElementById('rebateRow').style.display = 'flex';
+                    }
+                    document.getElementById('pacdRow').style.display = 'flex';
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                } else if (role === 'garment_supplier') {
+                    document.getElementById('totalPriceRow').style.display = 'flex';
+                } else if (role === 'packaging_supplier') {
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                }
             } else {
-                totalPrice = totalArea * SQM_PRICE;
-
-                document.getElementById('unitPrice').textContent = '$' + SQM_PRICE.toFixed(2);
-                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price';
-            }
-
-            const rebatePercent = 0.00;
-            const pacdPercent = 0.08;
-
-            const rebate = totalPrice * rebatePercent;
-            const pacd = (totalPrice) * pacdPercent;
-
-            let markingCost = 0;
-            if (quantity < 50) {
-                const markingType = document.querySelector('input[name="marking"]:checked').value;
-                if (markingType === 'print') {
-                    markingCost = 20.00;
-                } else if (markingType === 'label') {
-                    markingCost = quantity * 0.06;
-                }
-            }
-
-            const supplierPrice = totalPrice - rebate - pacd + markingCost;
-
-            document.getElementById('rebateLabel').textContent = `Rebates for Primark (${(rebatePercent * 100).toFixed(0)}%)`;
-            document.getElementById('pacdLabel').textContent = `Program Management Fee (${(pacdPercent * 100).toFixed(0)}%)`;
-
-            document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
-            document.getElementById('rebate').textContent = '$' + rebate.toFixed(2);
-            document.getElementById('pacd').textContent = '$' + pacd.toFixed(2);
-            document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
-
-            let showMarkingRow = false;
-            if (quantity < 50) {
-                const markingType = document.querySelector('input[name="marking"]:checked').value;
-                const priceWithMarking = totalPrice + markingCost;
-                document.getElementById('markingPrice').textContent = '$' + priceWithMarking.toFixed(2);
-
-                if ((role === 'admin' || role === 'garment_supplier') && markingType !== 'none') {
-                    document.getElementById('markingPriceRow').style.display = 'flex';
-                    showMarkingRow = true;
-                }
-            }
-
-            if (showMarkingRow) {
-                document.getElementById('totalPriceLabel').textContent = 'Total Price';
-            } else {
-                document.getElementById('totalPriceLabel').textContent = 'Total Price (LC Price)';
-            }
-
-            // Role visibility
-            if (role === 'admin') {
-                document.getElementById('unitPriceRow').style.display = 'flex';
-                document.getElementById('totalPriceRow').style.display = 'flex';
-                if (rebate !== 0) {
-                    document.getElementById('rebateRow').style.display = 'flex';
-                }
-                document.getElementById('pacdRow').style.display = 'flex';
-                document.getElementById('supplierPriceRow').style.display = 'flex';
-            } else if (role === 'garment_supplier') {
-                document.getElementById('totalPriceRow').style.display = 'flex';
-            } else if (role === 'packaging_supplier') {
-                document.getElementById('supplierPriceRow').style.display = 'flex';
+                document.getElementById('customMessage').style.display = 'block';
             }
 
             document.getElementById('results').children[2].style.display = 'flex';
@@ -1076,11 +1111,24 @@
             const getText = (id) => document.getElementById(id).textContent;
 
             // Populate Specifications
+            // Populate Specifications
             document.getElementById('pdf-specs').innerHTML = `
-                <div class="pdf-item"><span class="pdf-label">Origin:</span> <span class="pdf-value">${getVal('origin')}</span></div>
                 <div class="pdf-item"><span class="pdf-label">Flute Type:</span> <span class="pdf-value">${getVal('flute')}</span></div>
                 <div class="pdf-item"><span class="pdf-label">Carton Style:</span> <span class="pdf-value">${getVal('cartonStyle')}</span></div>
                 <div class="pdf-item"><span class="pdf-label">Carton Selection:</span> <span class="pdf-value">${getVal('cartonSelection') || 'Custom'}</span></div>
+            `;
+
+            // Populate Supplier & Factory Information
+            document.getElementById('pdf-supplier').innerHTML = `
+                <div class="pdf-item"><span class="pdf-label">Origin:</span> <span class="pdf-value">${getVal('origin')}</span></div>
+                <div class="pdf-item full-row" style="display: flex; gap: 10px;">
+                    <div style="flex: 3;"><span class="pdf-label">Supplier Name:</span> <span class="pdf-value">${getVal('supplierName') || '-'}</span></div>
+                    <div style="flex: 1;"><span class="pdf-label">Code:</span> <span class="pdf-value">${getVal('supplierCode') || '-'}</span></div>
+                </div>
+                <div class="pdf-item full-row" style="display: flex; gap: 10px;">
+                    <div style="flex: 3;"><span class="pdf-label">Factory Name:</span> <span class="pdf-value">${getVal('factoryName') || '-'}</span></div>
+                    <div style="flex: 1;"><span class="pdf-label">Code:</span> <span class="pdf-value">${getVal('factoryCode') || '-'}</span></div>
+                </div>
             `;
 
             // Populate Dimensions
@@ -1165,14 +1213,22 @@
                     length: getVal('length'),
                     width: getVal('width'),
                     height: getVal('height'),
-                    quantity: getVal('quantity')
+                    quantity: getVal('quantity'),
+                    areaPerCarton: getText('areaPerCarton'),
+                    totalArea: getText('totalArea'),
+                    sheetLength: getText('sheetLength'),
+                    sheetWidth: getText('sheetWidth')
+                },
+                supplier: {
+                    supplierName: getVal('supplierName'),
+                    supplierCode: getVal('supplierCode'),
+                    factoryName: getVal('factoryName'),
+                    factoryCode: getVal('factoryCode')
                 },
                 costs: []
             };
 
             const rows = [
-                { id: 'sheetLengthRow', label: 'Sheet Length' },
-                { id: 'sheetWidthRow', label: 'Sheet Width' },
                 { id: 'unitPriceRow', label: 'Unit Price' },
                 { id: 'totalPriceRow', label: 'Total Price', highlight: true },
                 { id: 'markingPriceRow', label: 'Price with Marking', highlight: true },
