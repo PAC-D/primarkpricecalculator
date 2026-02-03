@@ -17,14 +17,20 @@ A specialized web application designed for calculating packaging carton prices f
     *   **Program Management Fee**: Automatically applied at **5%** (calculated from Total Price).
     *   **Rebates**: Configurable rebate logic for Primark.
     *   **SQM Pricing**: Base price set to **$0.85 per m²** for custom dimensions.
-*   **Small Order Logic**: Applies specific marking/printing fees (Screen Print vs. Label) for orders with a **Quantity < 50**.
-*   **SQM Formula**: Uses a universal formula for all flute types including **8% wastage**.
-
+*   **SQM Formula**: Uses flute-specific trim formulas with **8% wastage**.
+    
 ### 🧮 SQM Calculation Formula
-The application uses the following universal formula for all Flute Types (C32, C40, BC40):
-*   **Sheet Length (L)**: `2 × (Length + Width) + 50` (mm)
-*   **Sheet Width (W)**: `(Height + Width) + 50` (mm)
-*   **Area Calculation**: `((L × W) / 1,000,000) × 1.08` *(Includes 8% Wastage factor)*
+The application uses specific formulas based on Flute Type:
+
+**For C Flute (C32, C40):**
+*   **Sheet Length (L)**: `2 × (Length + Width) + 15` (mm)
+*   **Sheet Width (W)**: `(Width + Height) - 10` (mm)
+
+**For BC Flute (BC40):**
+*   **Sheet Length (L)**: `2 × (Length + Width) + 11` (mm)
+*   **Sheet Width (W)**: `(Height + Width) - 16` (mm)
+
+**Area Calculation (All Types):** `((L × W) / 1,000,000) × 1.08` *(Includes 8% Wastage)*
 
 ### 📄 Professional PDF Export
 *   **Dedicated Print View**: Generates a clean, branded A4 Quote/Estimate using a separate layout engine (`pdf_export.html`).
@@ -48,6 +54,6 @@ The application uses the following universal formula for all Flute Types (C32, C
 
 ## Recent Updates
 
-*   **Calculation Logic**: Updated Print threshold to < 50 units, Fee to 5%, and implemented universal SQM formula with 8% wastage.
+*   **Calculation Logic**: Updated Print threshold to < 50 units, Fee to 5%, and implemented flute-specific SQM formula with 8% wastage.
 *   **PDF Export**: Completely overhauled export engine to use a cloned, off-screen renderer for consistent results across devices.
 *   **UI Polish**: Enhanced button alignment and spacing for a better user experience.

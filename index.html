@@ -983,14 +983,23 @@
 
             let L, W, areaPerCarton;
 
-            // Universal Formula for all flute types
-            // L = 2 * (L+W) + 50mm (derived from +0.05m)
-            L = (length + width) * 2 + 50;
-            // W = (H+W) + 50mm (derived from +0.05m)
-            W = (height + width) + 50;
+            const isBcLike = (flute === 'BC40');
+            const isCLike = (flute === 'C32' || flute === 'C40');
 
-            // Area in sqm with 8% wastage included
-            areaPerCarton = ((L * W) / 1000000) * 1.08;
+            if (isBcLike) {
+                L = (length + width) * 2 + 11;
+                W = (height + width) - 16;
+                // 8% Wastage applied
+                areaPerCarton = (L * W * 1.08) / 1000000;
+            } else if (isCLike) {
+                L = (length + width) * 2 + 15;
+                W = (width + height) - 10;
+                // 8% Wastage applied (Replacing old 2.5%)
+                areaPerCarton = (L * W * 1.08) / 1000000;
+            } else {
+                alert("Invalid Flute selection");
+                return;
+            }
 
             const totalArea = areaPerCarton * quantity;
 
