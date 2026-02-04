@@ -280,59 +280,81 @@
                 console.error('Error generating filename', e);
             }
 
-            // Fixed A4 width in pixels at 96DPI
-            const A4_WIDTH_PX = 794;
-            const A4_HEIGHT_PX = 1123;
+            // ========================================
+            // CLONE STRATEGY + FORCE EXACT DIMENSIONS
+            // ========================================
 
+            // Create a clean clone of the page element
+            const clone = element.cloneNode(true);
+
+            // Reset all transforms and styles to ensure print consistency
+            clone.style.transform = 'none';
+            clone.style.margin = '0';
+            clone.style.boxShadow = 'none';
+            clone.style.border = 'none';
+            clone.style.width = '210mm';           // Force exact A4 width
+            clone.style.minHeight = '297mm';       // Force exact A4 height
+            clone.style.height = 'auto';
+            clone.style.overflow = 'hidden';       // Clip any overflow to prevent blank pages
+            clone.style.position = 'relative';
+            clone.style.background = '#ffffff';
+
+            // Create an offscreen container to isolate from page CSS/zoom
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.top = '-9999px';       // Hidden off-screen
+            container.style.left = '-9999px';
+            container.style.width = '210mm';       // Enforce exact A4 width
+            container.style.height = '297mm';      // Enforce exact A4 height
+            container.style.overflow = 'hidden';   // Clip overflow to prevent extra pages
+            container.style.background = '#ffffff';
+            container.style.zIndex = '-9999';
+
+            container.appendChild(clone);
+            document.body.appendChild(container);
+
+            // PDF Generation Options
             const opt = {
                 margin: 0,
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
-                    scale: 2, // Consistent scale factor
-                    useCORS: true,
+                    scale: 2,              // 2x resolution for crisp output
+                    useCORS: true,         // Allow cross-origin images
                     scrollY: 0,
                     scrollX: 0,
-                    windowWidth: A4_WIDTH_PX, // Force HTML2Canvas to render at standard A4 width
-                    windowHeight: A4_HEIGHT_PX
+                    width: 794,            // Fixed A4 width in pixels (210mm at 96 DPI)
+                    height: 1123           // Fixed A4 height in pixels (297mm at 96 DPI)
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Clone to offscreen container
-            const clone = element.cloneNode(true);
-
-            // Reset styles to ensure print consistency
-            clone.style.transform = 'none';
-            clone.style.margin = '0';
-            clone.style.boxShadow = 'none';
-            clone.style.width = '210mm';
-            clone.style.minHeight = '296mm';
-            clone.style.height = 'auto';
-            clone.style.overflow = 'visible';
-            clone.style.position = 'relative';
-
-            // Wrapper to isolate from page CSS/zoom
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.top = '0';
-            container.style.left = '0';
-            container.style.width = '210mm'; // Enforce A4 width
-            container.style.zIndex = '-9999';
-            // Important: Force background to white as transparent backgrounds can look black in some PDF viewers
-            container.style.background = '#ffffff';
-
-            container.appendChild(clone);
-            document.body.appendChild(container);
-
-            html2pdf().set(opt).from(clone).save().then(() => {
-                document.body.removeChild(container);
+            // ========================================
+            // GENERATE PDF WITH PAGE CLEANUP
+            // ========================================
+            html2pdf().set(opt).from(clone).toPdf().get('pdf').then(function (pdf) {
+                // Remove any extra blank pages caused by sub-pixel overflow
+                const totalPages = pdf.internal.getNumberOfPages();
+                if (totalPages > 1) {
+                    // Delete pages backwards to avoid index shifting
+                    for (let i = totalPages; i > 1; i--) {
+                        pdf.deletePage(i);
+                    }
+                }
+            }).save().then(() => {
+                // Cleanup: Remove the offscreen container
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
                 status.textContent = 'PDF Downloaded! You can now close this tab.';
                 status.style.background = '#10b981';
                 document.getElementById('download-btn').style.display = 'block';
             }).catch(err => {
-                console.error(err);
-                if (document.body.contains(container)) document.body.removeChild(container);
+                console.error('PDF Generation Error:', err);
+                // Cleanup on error
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
                 status.textContent = 'Error generating PDF. Please try manual download.';
                 status.style.background = '#e31837';
                 document.getElementById('download-btn').style.display = 'block';
