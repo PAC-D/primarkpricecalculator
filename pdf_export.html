@@ -280,37 +280,48 @@
                 console.error('Error generating filename', e);
             }
 
+            // Fixed A4 width in pixels at 96DPI
+            const A4_WIDTH_PX = 794;
+            const A4_HEIGHT_PX = 1123;
+
             const opt = {
                 margin: 0,
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
-                    scale: 2,
+                    scale: 2, // Consistent scale factor
                     useCORS: true,
                     scrollY: 0,
-                    scrollX: 0
+                    scrollX: 0,
+                    windowWidth: A4_WIDTH_PX, // Force HTML2Canvas to render at standard A4 width
+                    windowHeight: A4_HEIGHT_PX
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Clone the element to render off-screen (prevents scroll/viewport issues)
+            // Clone to offscreen container
             const clone = element.cloneNode(true);
+
+            // Reset styles to ensure print consistency
             clone.style.transform = 'none';
             clone.style.margin = '0';
             clone.style.boxShadow = 'none';
+            clone.style.width = '210mm';
+            clone.style.minHeight = '296mm';
+            clone.style.height = 'auto';
+            clone.style.overflow = 'visible';
+            clone.style.position = 'relative';
 
-            // Force single page dimensions
-            clone.style.minHeight = 'unset';
-            clone.style.height = '296mm'; // Slightly less than 297mm to prevent overflow
-            clone.style.maxHeight = '296mm';
-            clone.style.overflow = 'hidden';
-
-            // Create container
+            // Wrapper to isolate from page CSS/zoom
             const container = document.createElement('div');
             container.style.position = 'absolute';
-            container.style.top = '-9999px';
-            container.style.left = '-9999px';
-            container.style.width = '210mm';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.width = '210mm'; // Enforce A4 width
+            container.style.zIndex = '-9999';
+            // Important: Force background to white as transparent backgrounds can look black in some PDF viewers
+            container.style.background = '#ffffff';
+
             container.appendChild(clone);
             document.body.appendChild(container);
 
@@ -321,7 +332,7 @@
                 document.getElementById('download-btn').style.display = 'block';
             }).catch(err => {
                 console.error(err);
-                document.body.removeChild(container);
+                if (document.body.contains(container)) document.body.removeChild(container);
                 status.textContent = 'Error generating PDF. Please try manual download.';
                 status.style.background = '#e31837';
                 document.getElementById('download-btn').style.display = 'block';
@@ -393,7 +404,7 @@
 
             // Row 1
             specsHtml += `<div class="grid-item"><div class="label">Flute Type (Quality)</div><div class="value">${data.specs.flute}</div></div>`;
-            specsHtml += `<div class="grid-item"><div class="label">Carton Style</div><div class="value">${data.specs.cartonStyle}</div></div>`;
+            specsHtml += `<div class="grid-item"><div class="label">Carton Type</div><div class="value">${data.specs.cartonStyle}</div></div>`;
             specsHtml += `</div><div class="grid-row">`;
 
             // Row 2
