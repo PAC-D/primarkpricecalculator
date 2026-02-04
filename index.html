@@ -563,7 +563,7 @@
     <nav class="navbar">
         <div class="logo-section">
             <img src="assets/allport-pacd-logo.png" alt="PACD Logo" class="logo-img">
-            <h1>Primark Price Calculator</h1>
+            <h1></h1>
         </div>
         <img src="assets/Primark-logo.png" alt="Primark Logo" class="logo-img">
         <!-- Optional: Add a back button if integrated in a suite -->
@@ -574,7 +574,7 @@
         <div class="calculator-card">
             <div class="card-header">
                 <h2>Carton Price Calculator</h2>
-                <p>Packaging Supplier Management</p>
+                <p>Packaging Supplier Management (Only for Bangladesh)</p>
             </div>
 
             <!-- Supplier & Factory Information -->
@@ -589,7 +589,7 @@
                     </div>
                     <div class="form-group floating-group">
                         <input type="text" id="supplierCode" placeholder=" ">
-                        <label for="supplierCode">Code</label>
+                        <label for="supplierCode">Supplier Code</label>
                     </div>
                 </div>
 
@@ -601,8 +601,28 @@
                     </div>
                     <div class="form-group floating-group">
                         <input type="text" id="factoryCode" placeholder=" ">
-                        <label for="factoryCode">Code</label>
+                        <label for="factoryCode">Factory Code</label>
                     </div>
+                </div>
+
+                <!-- Packaging Supplier -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="select-label">Packaging Supplier Name</label>
+                    <select id="packagingSupplier" class="custom-select">
+                        <option value="">Select Supplier</option>
+                        <option value="Uniglory Paper & Packaging">Uniglory Paper & Packaging</option>
+                        <option value="Reflex">Reflex Packaging Ltd</option>
+                        <option value="M & U Packaging Limited">M & U Packaging Limited</option>
+                        <option value="franswan packaging">Franswan packaging</option>
+                    </select>
+                </div>
+
+                <!-- Flute Type (Moved) -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="select-label">Flute Type</label>
+                    <select id="flute" class="custom-select" disabled style="background-color: #f1f5f9;">
+                        <option value="C40" selected>C Flute (C40ECT)</option>
+                    </select>
                 </div>
             </div>
 
@@ -610,11 +630,10 @@
             <div class="form-section">
                 <label class="section-label">Specifications</label>
 
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label class="select-label">Manufacturer Origin</label>
                     <select id="origin" class="custom-select" onchange="updateOrigin()">
-                        <option value="">Select Origin</option>
-                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="Bangladesh" selected>Bangladesh</option>
                         <option value="India">India</option>
                         <option value="Sri Lanka">Sri Lanka</option>
                         <option value="Pakistan">Pakistan</option>
@@ -626,19 +645,11 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label class="select-label">Flute Type</label>
-                    <select id="flute" class="custom-select" onchange="updateCartonStyle()" disabled>
-                        <option value="">Select Flute Type</option>
-                        <option value="C32">C Flute (C32 ECT)</option>
-                        <option value="C40">C Flute (C40 ECT)</option>
-                        <option value="BC40" id="opt-bc40">BC Flute (BC40 ECT)</option>
-                    </select>
-                </div>
+                <!-- Flute Type Moved to Top -->
 
                 <div class="form-group">
                     <label class="select-label">Carton Style</label>
-                    <select id="cartonStyle" class="custom-select" onchange="updateCartonSelection()" disabled>
+                    <select id="cartonStyle" class="custom-select" onchange="updateCartonSelection()">
                         <option value="">Select Carton Style</option>
                         <option value="standard">Standard Footprint</option>
                         <option value="custom">Custom</option>
@@ -683,23 +694,12 @@
 
             <!-- Marking Section (Conditional) -->
             <div class="form-group" id="markingSection" style="display: none;">
-                <label
-                    style="color: var(--secondary); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">
-                    Print on Carton (Qty < 50) </label>
-                        <div class="marking-options">
-                            <label class="marking-label">
-                                <input type="radio" name="marking" value="print" checked>
-                                <span>Screen Print ($20.00 Set-up Fee)</span>
-                            </label>
-                            <label class="marking-label">
-                                <input type="radio" name="marking" value="label">
-                                <span>Label Print ($0.06 per label)</span>
-                            </label>
-                            <label class="marking-label">
-                                <input type="radio" name="marking" value="none">
-                                <span>None (Print at own factory)</span>
-                            </label>
-                        </div>
+                <div
+                    style="padding: 1rem; background: #fff7ed; border: 1px solid #fdba74; border-radius: 0.75rem; color: #9a3412; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                    <span><strong>Small Order Surcharge:</strong> A $20.00 setup fee applies for orders under 50
+                        cartons.</span>
+                </div>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 0;">
@@ -738,7 +738,7 @@
                 </div>
 
                 <div class="result-item highlight-result full-width" id="markingPriceRow" style="display: none;">
-                    <span class="result-label">Price with Carton Marking</span>
+                    <span class="result-label">LC Price with Carton Marking</span>
                     <span class="result-value" id="markingPrice">-</span>
                 </div>
 
@@ -752,7 +752,7 @@
                 </div>
                 <div class="result-item full-width highlight-result" id="supplierPriceRow"
                     style="display: none; --primary: #0f172a;">
-                    <span class="result-label">Packaging Supplier Price</span>
+                    <span class="result-label">Packaging Supplier Net Revenue</span>
                     <span class="result-value" id="supplierPrice">-</span>
                 </div>
 
@@ -775,7 +775,7 @@
     <div id="pdf-template">
         <div class="pdf-header">
             <img src="assets/allport-pacd-logo.png" alt="PACD" class="pdf-logo">
-            <h1>Cost Estimate</h1>
+            <h1>Carton Price Calculator for Primark</h1>
             <img src="assets/Primark-logo.png" alt="Primark" class="pdf-logo">
         </div>
 
@@ -820,18 +820,20 @@
         const role = 'admin';
 
         const cartonData = {
-            'A1': { L: 495, W: 285, H: null, unitPrice: 0.97 },
-            'A2': { L: 495, W: 285, H: null, unitPrice: 0.88 },
-            'A3': { L: 495, W: 285, H: null, unitPrice: 0.81 },
-            'B1': { L: 595, W: 285, H: null, unitPrice: 1.10 },
-            'B2': { L: 595, W: 285, H: null, unitPrice: 0.99 },
-            'B3': { L: 595, W: 285, H: null, unitPrice: 0.90 },
-            'C1': { L: 595, W: 325, H: null, unitPrice: 1.22 },
-            'C2': { L: 595, W: 325, H: null, unitPrice: 1.10 },
-            'C3': { L: 595, W: 325, H: null, unitPrice: 1.02 },
-            'D1': { L: 595, W: 380, H: null, unitPrice: 1.39 },
-            'D2': { L: 595, W: 380, H: null, unitPrice: 1.27 },
-            'D3': { L: 595, W: 380, H: null, unitPrice: 1.18 }
+            'S1': { L: 570, W: 500, H: null },
+            'S2': { L: 580, W: 400, H: null },
+            'S3': { L: 600, W: 330, H: null },
+            'S4': { L: 500, W: 380, H: null },
+            'S5': { L: 500, W: 330, H: null },
+            'S6': { L: 500, W: 300, H: null },
+            'S7': { L: 600, W: 250, H: null },
+            'S8': { L: 400, W: 330, H: null },
+            'S9': { L: 400, W: 300, H: null },
+            'S10': { L: 600, W: 200, H: null },
+            'S11': { L: 570, W: 200, H: null },
+            'S12': { L: 460, W: 240, H: null },
+            'S13': { L: 330, W: 300, H: null },
+            'S14': { L: 460, W: 200, H: null }
         };
 
         const allResultRows = [
@@ -865,25 +867,15 @@
             const bc40Option = document.getElementById('opt-bc40');
 
             if (!origin) {
-                fluteSelect.disabled = true;
-                fluteSelect.value = "";
+                // fluteSelect.disabled = true; 
+                // Don't disable flute as it is fixed now
                 document.getElementById('cartonStyle').disabled = true;
                 return;
             }
 
-            fluteSelect.disabled = false;
+            // Fixed Flute, so no need to enable/disable or check BC40
+            // if (origin === 'Bangladesh') { ... } logic removed as Flute is static C40
 
-            // Logic: If Bangladesh, disable BC40
-            if (origin === 'Bangladesh') {
-                bc40Option.disabled = true;
-                bc40Option.style.display = 'none'; // Visual hide
-                if (fluteSelect.value === 'BC40') {
-                    fluteSelect.value = '';
-                }
-            } else {
-                bc40Option.disabled = false;
-                bc40Option.style.display = 'block';
-            }
             updateCartonStyle();
         }
 
@@ -917,7 +909,7 @@
                 const options = Object.keys(cartonData);
                 options.forEach(opt => {
                     const data = cartonData[opt];
-                    const display = `${opt} (${data.L} x ${data.W} mm)`;
+                    const display = `${data.L} x ${data.W} mm (Variable Height)`;
                     cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
                 });
                 cartonSelectionSelect.disabled = false;
@@ -1021,21 +1013,14 @@
             const skipPrice = (style === 'custom' && origin !== 'Bangladesh');
 
             let totalPrice = 0;
-            const SQM_PRICE = 0.85;
+            const SQM_PRICE = 0.80;
 
             if (!skipPrice) {
-                if (style === 'standard') {
-                    const unitPrice = cartonData[selection].unitPrice;
-                    totalPrice = quantity * unitPrice;
+                // All cartons now use SQM Price
+                totalPrice = totalArea * SQM_PRICE;
 
-                    document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
-                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price';
-                } else {
-                    totalPrice = totalArea * SQM_PRICE;
-
-                    document.getElementById('unitPrice').textContent = '$' + SQM_PRICE.toFixed(2);
-                    document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price';
-                }
+                document.getElementById('unitPrice').textContent = '$' + SQM_PRICE.toFixed(2);
+                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price';
 
                 const rebatePercent = 0.00;
                 const pacdPercent = 0.05;
@@ -1045,12 +1030,7 @@
 
                 let markingCost = 0;
                 if (quantity < 50) {
-                    const markingType = document.querySelector('input[name="marking"]:checked').value;
-                    if (markingType === 'print') {
-                        markingCost = 20.00;
-                    } else if (markingType === 'label') {
-                        markingCost = quantity * 0.06;
-                    }
+                    markingCost = 20.00;
                 }
 
                 const supplierPrice = totalPrice - rebate - pacd + markingCost;
@@ -1065,11 +1045,10 @@
 
                 let showMarkingRow = false;
                 if (quantity < 50) {
-                    const markingType = document.querySelector('input[name="marking"]:checked').value;
                     const priceWithMarking = totalPrice + markingCost;
                     document.getElementById('markingPrice').textContent = '$' + priceWithMarking.toFixed(2);
 
-                    if ((role === 'admin' || role === 'garment_supplier') && markingType !== 'none') {
+                    if (role === 'admin' || role === 'garment_supplier') {
                         document.getElementById('markingPriceRow').style.display = 'flex';
                         showMarkingRow = true;
                     }
@@ -1123,20 +1102,21 @@
             // Populate Specifications
             document.getElementById('pdf-specs').innerHTML = `
                 <div class="pdf-item"><span class="pdf-label">Flute Type:</span> <span class="pdf-value">${getVal('flute')}</span></div>
-                <div class="pdf-item"><span class="pdf-label">Carton Style:</span> <span class="pdf-value">${getVal('cartonStyle')}</span></div>
+                <div class="pdf-item"><span class="pdf-label">Carton Type:</span> <span class="pdf-value">${getVal('cartonStyle')}</span></div>
                 <div class="pdf-item"><span class="pdf-label">Carton Selection:</span> <span class="pdf-value">${getVal('cartonSelection') || 'Custom'}</span></div>
             `;
 
             // Populate Supplier & Factory Information
             document.getElementById('pdf-supplier').innerHTML = `
                 <div class="pdf-item"><span class="pdf-label">Origin:</span> <span class="pdf-value">${getVal('origin')}</span></div>
+                <div class="pdf-item"><span class="pdf-label">Packaging Supplier:</span> <span class="pdf-value">${getVal('packagingSupplier') || '-'}</span></div>
                 <div class="pdf-item full-row" style="display: flex; gap: 10px;">
                     <div style="flex: 3;"><span class="pdf-label">Supplier Name:</span> <span class="pdf-value">${getVal('supplierName') || '-'}</span></div>
-                    <div style="flex: 1;"><span class="pdf-label">Code:</span> <span class="pdf-value">${getVal('supplierCode') || '-'}</span></div>
+                    <div style="flex: 1;"><span class="pdf-label">Supplier Code:</span> <span class="pdf-value">${getVal('supplierCode') || '-'}</span></div>
                 </div>
                 <div class="pdf-item full-row" style="display: flex; gap: 10px;">
                     <div style="flex: 3;"><span class="pdf-label">Factory Name:</span> <span class="pdf-value">${getVal('factoryName') || '-'}</span></div>
-                    <div style="flex: 1;"><span class="pdf-label">Code:</span> <span class="pdf-value">${getVal('factoryCode') || '-'}</span></div>
+                    <div style="flex: 1;"><span class="pdf-label">Factory Code:</span> <span class="pdf-value">${getVal('factoryCode') || '-'}</span></div>
                 </div>
             `;
 
@@ -1214,7 +1194,7 @@
             const exportData = {
                 specs: {
                     origin: getVal('origin'), // Origin names are same as values
-                    flute: getVal('flute'),   // Flute names are same as values
+                    flute: document.getElementById('flute').options[0].text,   // Force capture of first option text since it is disabled/fixed
                     cartonStyle: getText('cartonStyle'), // Get "Standard Footprint" text
                     cartonSelection: cartonStyleVal === 'custom' ? null : getText('cartonSelection')
                 },
@@ -1232,7 +1212,8 @@
                     supplierName: getVal('supplierName'),
                     supplierCode: getVal('supplierCode'),
                     factoryName: getVal('factoryName'),
-                    factoryCode: getVal('factoryCode')
+                    factoryCode: getVal('factoryCode'),
+                    packagingSupplier: getVal('packagingSupplier')
                 },
                 costs: []
             };

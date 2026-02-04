@@ -213,6 +213,12 @@
             <img src="assets/Primark-logo.png" alt="Primark" class="logo">
         </div>
 
+        <h1 style="text-align: center; color: #00205b; font-size: 1.5rem; margin-top: -10px; margin-bottom: 5px;">Carton
+            Price Calculator for Primark</h1>
+        <div style="text-align: right; margin-bottom: 20px; font-size: 0.85rem; color: #64748b;">
+            Date: <span id="date-header"></span>
+        </div>
+
 
 
         <div class="content">
@@ -241,9 +247,7 @@
             </div>
         </div>
 
-        <div class="footer">
-            Generated on <span id="date"></span> using PACD Price Calculator
-        </div>
+        <!-- Footer Removed -->
     </div>
 
     <!-- Manual Download Button (Hidden initially) -->
@@ -259,9 +263,26 @@
 
             status.textContent = 'Generating PDF...';
 
+            // Determine Filename
+            let filename = 'PACD-Carton-Price.pdf';
+            try {
+                const data = JSON.parse(window.localStorage.getItem('printData'));
+                if (data && data.dims) {
+                    const isStandard = data.specs.cartonStyle.includes('Standard');
+                    const prefix = isStandard ? 'stn' : 'cus';
+                    const L = data.dims.length;
+                    const W = data.dims.width;
+                    const H = data.dims.height;
+                    const Q = data.dims.quantity;
+                    filename = `${prefix}${L}${W}${H}_${Q}.pdf`;
+                }
+            } catch (e) {
+                console.error('Error generating filename', e);
+            }
+
             const opt = {
                 margin: 0,
-                filename: 'PACD-Carton-Price.pdf',
+                filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
                     scale: 2,
@@ -315,7 +336,7 @@
                 return;
             }
 
-            document.getElementById('date').textContent = new Date().toLocaleDateString();
+            document.getElementById('date-header').textContent = new Date().toLocaleDateString();
 
             // Supplier & Factory Information (First)
             // Supplier & Factory Information (First)
@@ -324,9 +345,15 @@
 
             // Row 0: Origin
             supplierHtml += `
-                <div style="margin-bottom: 0.75rem;">
-                    <div class="label">Origin</div>
-                    <div class="value">${data.specs.origin || '-'}</div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                    <div style="flex: 1;">
+                        <div class="label">Origin</div>
+                        <div class="value">${data.specs.origin || '-'}</div>
+                    </div>
+                     <div style="flex: 1;">
+                        <div class="label">Packaging Supplier</div>
+                        <div class="value">${data.supplier.packagingSupplier || '-'}</div>
+                    </div>
                 </div>
             `;
 
@@ -365,7 +392,7 @@
             let specsHtml = '<h2>Specifications</h2><div class="grid-row">';
 
             // Row 1
-            specsHtml += `<div class="grid-item"><div class="label">Flute Type</div><div class="value">${data.specs.flute}</div></div>`;
+            specsHtml += `<div class="grid-item"><div class="label">Flute Type (Quality)</div><div class="value">${data.specs.flute}</div></div>`;
             specsHtml += `<div class="grid-item"><div class="label">Carton Style</div><div class="value">${data.specs.cartonStyle}</div></div>`;
             specsHtml += `</div><div class="grid-row">`;
 
