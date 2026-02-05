@@ -308,7 +308,7 @@
             // Reset all transforms and styles to ensure print consistency
             clone.style.transform = 'none';
             clone.style.margin = '0';
-            clone.style.padding = '15mm'; // Match original padding
+            clone.style.padding = '20mm'; // Increased padding for safety
             clone.style.boxShadow = 'none';
             clone.style.border = 'none';
             clone.style.width = '210mm';           // Force exact A4 width
@@ -345,11 +345,15 @@
                     useCORS: true,         // Allow cross-origin images
                     scrollY: 0,
                     scrollX: 0,
+                    x: 0,
+                    y: 0,
                     width: 794,            // Fixed A4 width in pixels (210mm at 96 DPI)
                     height: 1123,          // Fixed A4 height in pixels (297mm at 96 DPI)
                     windowWidth: 794,      // Force consistent viewport width
                     windowHeight: 1123,    // Force consistent viewport height
-                    deviceScaleFactor: 1   // Ignore device pixel ratio for consistent output
+                    deviceScaleFactor: 1,  // Ignore device pixel ratio for consistent output
+                    letterRendering: 1,
+                    allowTaint: true
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
