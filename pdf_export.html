@@ -290,7 +290,7 @@
             // Reset all transforms and styles to ensure print consistency
             clone.style.transform = 'none';
             clone.style.margin = '0';
-            clone.style.padding = '15mm';
+            clone.style.padding = '15mm'; // Match original padding
             clone.style.boxShadow = 'none';
             clone.style.border = 'none';
             clone.style.width = '210mm';           // Force exact A4 width
@@ -310,9 +310,9 @@
             container.style.height = '297mm';      // Enforce exact A4 height
             container.style.overflow = 'hidden';   // Clip overflow to prevent extra pages
             container.style.background = '#ffffff';
-            container.style.zIndex = '-9999';
-            container.style.visibility = 'hidden'; // Hide but keep in layout for proper capture
-            container.style.pointerEvents = 'none';
+            container.style.zIndex = '-9999';      // Hide behind other content
+            container.style.margin = '0';
+            container.style.padding = '0';
 
             container.appendChild(clone);
             document.body.appendChild(container);
@@ -327,9 +327,11 @@
                     useCORS: true,         // Allow cross-origin images
                     scrollY: 0,
                     scrollX: 0,
-                    x: 0,                  // Start capture from left edge
-                    y: 0,                  // Start capture from top edge
-                    logging: false
+                    width: 794,            // Fixed A4 width in pixels (210mm at 96 DPI)
+                    height: 1123,          // Fixed A4 height in pixels (297mm at 96 DPI)
+                    windowWidth: 794,      // Force consistent viewport width
+                    windowHeight: 1123,    // Force consistent viewport height
+                    deviceScaleFactor: 1   // Ignore device pixel ratio for consistent output
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
