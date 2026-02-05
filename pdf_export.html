@@ -257,6 +257,24 @@
     </button>
 
     <script>
+        // Helper to retrieve data from URL param or LocalStorage
+        function getExportData() {
+            try {
+                // Check URL params first (for file:// support)
+                const urlParams = new URLSearchParams(window.location.search);
+                const encodedData = urlParams.get('data');
+                if (encodedData) {
+                    const jsonString = decodeURIComponent(atob(encodedData));
+                    return JSON.parse(jsonString);
+                }
+                // Fallback to LocalStorage
+                return JSON.parse(window.localStorage.getItem('printData'));
+            } catch (e) {
+                console.error('Error retrieving data:', e);
+                return null;
+            }
+        }
+
         function generatePDF() {
             const element = document.getElementById('page');
             const status = document.getElementById('status-bar');
@@ -266,7 +284,7 @@
             // Determine Filename
             let filename = 'PACD-Carton-Price.pdf';
             try {
-                const data = JSON.parse(window.localStorage.getItem('printData'));
+                const data = getExportData();
                 if (data && data.dims) {
                     const isStandard = data.specs.cartonStyle.includes('Standard');
                     const prefix = isStandard ? 'stn' : 'cus';
@@ -369,7 +387,7 @@
         }
 
         window.onload = function () {
-            const data = JSON.parse(window.localStorage.getItem('printData'));
+            const data = getExportData();
 
             if (!data) {
                 document.body.innerHTML = '<h1 style="color: white; margin-top: 50px; text-align: center;">No data found. Please calculate price first.</h1>';

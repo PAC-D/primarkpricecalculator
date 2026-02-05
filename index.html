@@ -574,7 +574,7 @@
         <div class="calculator-card">
             <div class="card-header">
                 <h2>Carton Price Calculator</h2>
-                <p>Packaging Supplier Management (Only for Bangladesh)</p>
+                <p id="subtitle">Packaging Supplier Management (Only for Bangladesh)</p>
             </div>
 
             <!-- Supplier & Factory Information -->
@@ -819,6 +819,10 @@
         lucide.createIcons();
 
         const role = 'admin';
+
+        if (role === 'garment_supplier') {
+            document.getElementById('subtitle').textContent = '(Only for Bangladesh)';
+        }
 
         const cartonData = {
             'S1': { L: 570, W: 500, H: null },
@@ -1241,11 +1245,12 @@
                 }
             });
 
-            // Save to LocalStorage
-            localStorage.setItem('printData', JSON.stringify(exportData));
+            // Encode data for URL transport (Base64) to support file:// protocol
+            const jsonString = JSON.stringify(exportData);
+            const encodedData = btoa(encodeURIComponent(jsonString));
 
-            // Open Export Page
-            window.open('pdf_export.html', '_blank');
+            // Open Export Page with Data in URL
+            window.open(`pdf_export.html?data=${encodedData}`, '_blank');
         }
     </script>
 </body>
