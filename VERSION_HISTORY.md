@@ -1,7 +1,43 @@
-# Version 2.1 Updates
+# Version History
+**Primark Carton Price Calculator**
+
+---
+
+## Version 2.2
 **Date:** February 5, 2026
 
-## 1. User Interface (index.html)
+### Changes
+
+#### 1. User Interface (index.html)
+- **Carton Type Options**: 
+  - Changed "Custom" to "Custom Carton"
+  - Changed "Standard Footprint" to "Standard Carton (Variable Height)"
+- **Carton Selection**: Removed "(Variable Height)" from individual carton options (now shown in Carton Type)
+- **Small Order Surcharge Text**: Updated message from "Small Order Surcharge: A $20.00 setup fee applies for orders under 50 cartons." to "Below MOQ (>50) packaging supplier will charge $20 per size breakdown."
+- **Flute Type**: Changed "C Flute (C40ECT)" to "C Flute (40ECT)"
+- **Packaging Suppliers**: Updated supplier list to:
+  - Uniglory Packaging Industries Ltd.
+  - Reflex Packaging Ltd.
+  - Transworld Packaging Ltd.
+  - Union Label & Accessories Ltd.
+  - Epyllion Ltd.
+  - Youngshine Packtrims Ltd.
+
+#### 2. Calculation Logic
+- **Unit Price**: Now displays the actual single carton price (`Area per Carton × SQM Price`) instead of showing the SQM price itself.
+
+#### 3. PDF Export (pdf_export.html)
+- **Layout**: Moved "Packaging Supplier" to appear below "Factory Name" section
+- **Device Consistency**: Added `windowWidth`, `windowHeight`, and `deviceScaleFactor` settings to ensure consistent PDF output across all devices regardless of screen DPI or pixel ratio.
+
+---
+
+## Version 2.1
+**Date:** February 5, 2026
+
+### Changes
+
+#### 1. User Interface (index.html)
 - **Header**: Removed "Primark Price Calculator" text from the main navigation bar.
 - **Labels**: Renamed generic "Code" fields to specific "Supplier Code" and "Factory Code".
 - **New Field**: Added "Packaging Supplier Name" dropdown with specific options (Uniglory, Reflex, etc.) in the Supplier Information section.
@@ -10,7 +46,7 @@
 - **Carton Display**: Updated standard carton dropdown items to show as `Length x Width mm (Variable Height)`.
 - **Carton Type**: Enabled "Carton Type" selection by default.
 
-## 2. Calculation Logic
+#### 2. Calculation Logic
 - **Standard Cartons**: Updated the list of standard carton dimensions with 14 new size pairs.
 - **Pricing Formula**: 
   - Set base **SQM Price to $0.80**.
@@ -19,7 +55,7 @@
   - Replaced the previous marking options (Label/Screen Print) with a flat **$20.00 Small Order Surcharge** applied automatically to orders with quantity < 50.
 - **Wastage**: Confirmed 8% wastage (1.08x) is applied strictly to the Area calculation.
 
-## 3. PDF Export (pdf_export.html)
+#### 3. PDF Export (pdf_export.html)
 - **Heading**: Added a main heading "Carton Price Calculator for Primark".
 - **Fields**: Included "Packaging Supplier" in the Supplier Information section.
 - **Layout**: 

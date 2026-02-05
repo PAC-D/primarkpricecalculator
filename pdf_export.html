@@ -324,7 +324,10 @@
                     scrollY: 0,
                     scrollX: 0,
                     width: 794,            // Fixed A4 width in pixels (210mm at 96 DPI)
-                    height: 1123           // Fixed A4 height in pixels (297mm at 96 DPI)
+                    height: 1123,          // Fixed A4 height in pixels (297mm at 96 DPI)
+                    windowWidth: 794,      // Force consistent viewport width
+                    windowHeight: 1123,    // Force consistent viewport height
+                    deviceScaleFactor: 1   // Ignore device pixel ratio for consistent output
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
@@ -383,10 +386,6 @@
                         <div class="label">Origin</div>
                         <div class="value">${data.specs.origin || '-'}</div>
                     </div>
-                     <div style="flex: 1;">
-                        <div class="label">Packaging Supplier</div>
-                        <div class="value">${data.supplier.packagingSupplier || '-'}</div>
-                    </div>
                 </div>
             `;
 
@@ -414,6 +413,16 @@
                     <div style="flex: 1;">
                         <div class="label">Factory Code</div>
                         <div class="value">${data.supplier.factoryCode || '-'}</div>
+                    </div>
+                </div>
+            `;
+
+            // Row 3: Packaging Supplier (below Factory)
+            supplierHtml += `
+                <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                    <div style="flex: 1;">
+                        <div class="label">Packaging Supplier</div>
+                        <div class="value">${data.supplier.packagingSupplier || '-'}</div>
                     </div>
                 </div>
             `;

@@ -39,11 +39,11 @@ The application uses specific formulas based on Flute Type:
 
 ## Usage
 
-1.  **Launch**: Open `index.html` in any modern web browser.
-2.  **Configure**: Select your Origin, Flute Type, and Carton Style.
-3.  **Input**: Enter dimensions (if custom) and the required Carton Quantity.
-4.  **Calculate**: Click **Calculate Price** to see the detailed cost breakdown.
-5.  **Export**: Click **Export PDF** to generate a formal quote document.
+1.  **Configure**: Select your Origin, Flute Type, and Carton Style.
+2.  **Input**: Enter dimensions (if custom) and the required Carton Quantity.
+3.  **Calculate**: Click **Calculate Price** to see the detailed cost breakdown.
+4.  **Export**: Click **Export PDF** to generate a formal quote document.
+
 
 ## Technical Details
 

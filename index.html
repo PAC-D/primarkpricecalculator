@@ -610,10 +610,12 @@
                     <label class="select-label">Packaging Supplier Name</label>
                     <select id="packagingSupplier" class="custom-select">
                         <option value="">Select Supplier</option>
-                        <option value="Uniglory Paper & Packaging">Uniglory Paper & Packaging</option>
-                        <option value="Reflex">Reflex Packaging Ltd</option>
-                        <option value="M & U Packaging Limited">M & U Packaging Limited</option>
-                        <option value="franswan packaging">Franswan packaging</option>
+                        <option value="Uniglory Packaging Industries Ltd.">Uniglory Packaging Industries Ltd.</option>
+                        <option value="Reflex Packaging Ltd.">Reflex Packaging Ltd.</option>
+                        <option value="Transworld Packaging Ltd.">Transworld Packaging Ltd.</option>
+                        <option value="Union Label & Accessories Ltd.">Union Label & Accessories Ltd.</option>
+                        <option value="Epyllion Ltd.">Epyllion Ltd.</option>
+                        <option value="Youngshine Packtrims Ltd.">Youngshine Packtrims Ltd.</option>
                     </select>
                 </div>
 
@@ -621,7 +623,7 @@
                 <div class="form-group" style="margin-top: 1rem;">
                     <label class="select-label">Flute Type</label>
                     <select id="flute" class="custom-select" disabled style="background-color: #f1f5f9;">
-                        <option value="C40" selected>C Flute (C40ECT)</option>
+                        <option value="C40" selected>C Flute (40ECT)</option>
                     </select>
                 </div>
             </div>
@@ -651,8 +653,8 @@
                     <label class="select-label">Carton Type</label>
                     <select id="cartonStyle" class="custom-select" onchange="updateCartonSelection()">
                         <option value="">Select Carton Type</option>
-                        <option value="standard">Standard Footprint</option>
-                        <option value="custom">Custom</option>
+                        <option value="standard">Standard Carton (Variable Height)</option>
+                        <option value="custom">Custom Carton</option>
                     </select>
                 </div>
 
@@ -697,8 +699,7 @@
                 <div
                     style="padding: 1rem; background: #fff7ed; border: 1px solid #fdba74; border-radius: 0.75rem; color: #9a3412; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
                     <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
-                    <span><strong>Small Order Surcharge:</strong> A $20.00 setup fee applies for orders under 50
-                        cartons.</span>
+                    <span><strong>Below MOQ (>50)</strong> packaging supplier will charge $20 per size breakdown.</span>
                 </div>
             </div>
 
@@ -909,7 +910,7 @@
                 const options = Object.keys(cartonData);
                 options.forEach(opt => {
                     const data = cartonData[opt];
-                    const display = `${data.L} x ${data.W} mm (Variable Height)`;
+                    const display = `${data.L} x ${data.W} mm`;
                     cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
                 });
                 cartonSelectionSelect.disabled = false;
@@ -986,7 +987,7 @@
             } else if (isCLike) {
                 L = (length + width) * 2 + 15;
                 W = (width + height) - 10;
-                // 8% Wastage applied (Replacing old 2.5%)
+                // 8% Wastage applied
                 areaPerCarton = (L * W * 1.08) / 1000000;
             } else {
                 alert("Invalid Flute selection");
@@ -1019,8 +1020,10 @@
                 // All cartons now use SQM Price
                 totalPrice = totalArea * SQM_PRICE;
 
-                document.getElementById('unitPrice').textContent = '$' + SQM_PRICE.toFixed(2);
-                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'SQM Price';
+                // Calculate unit price (single carton price)
+                const unitPriceValue = areaPerCarton * SQM_PRICE;
+                document.getElementById('unitPrice').textContent = '$' + unitPriceValue.toFixed(2);
+                document.getElementById('unitPriceRow').querySelector('.result-label').textContent = 'Unit Price';
 
                 const rebatePercent = 0.00;
                 const pacdPercent = 0.05;
