@@ -3,6 +3,18 @@
 
 ---
 
+## Version 2.3
+**Date:** February 6, 2026
+
+### Changes
+
+#### 1. Calculation Logic
+- **C-Flute Formula Update**: Adjusted the blank sheet calculation for C-Flute (C32/C40):
+  - Length Formula: `(length + width) * 2 + 50` (Previously `+ 15`)
+  - Width Formula: `(width + height)` (Previously `(width + height) - 10`)
+  - **Full Formula**: `Area = ((2*L + 2*W + 50) * (H + W) / 1,000,000) * 1.08`
+
+
 ## Version 2.2
 **Date:** February 5, 2026
 
