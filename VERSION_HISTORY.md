@@ -3,6 +3,16 @@
 
 ---
 
+## Version 2.4
+**Date:** February 8, 2026
+
+### Changes
+
+#### 1. Pricing Update
+- **SQM Rate**: Reduced the base SQM price rate from **$0.80** to **$0.75** USD.
+
+---
+
 ## Version 2.3
 **Date:** February 6, 2026
 

@@ -16,7 +16,7 @@ A specialized web application designed for calculating packaging carton prices f
 *   **Fee Structure**:
     *   **Program Management Fee**: Automatically applied at **5%** (calculated from Total Price).
     *   **Rebates**: Configurable rebate logic for Primark.
-    *   **SQM Pricing**: Base price set to **$0.85 per m²** for custom dimensions.
+    *   **SQM Pricing**: Base price set to **$0.75 per m²** for custom dimensions.
 *   **SQM Formula**: Uses flute-specific trim formulas with **8% wastage**.
     
 ### 🧮 SQM Calculation Formula
