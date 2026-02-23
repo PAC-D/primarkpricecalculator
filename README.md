@@ -54,6 +54,6 @@ The application uses specific formulas based on Flute Type:
 
 ## Recent Updates
 
-*   **Calculation Logic**: Updated Print threshold to < 50 units, Fee to 5%, and implemented flute-specific SQM formula with 8% wastage.
-*   **PDF Export**: Completely overhauled export engine to use a cloned, off-screen renderer for consistent results across devices.
-*   **UI Polish**: Enhanced button alignment and spacing for a better user experience.
+*   **v2.5 — PDF Cross-Device Fix (Feb 2026)**: Fixed PDF exports looking different on different devices by switching from `mm` to fixed `px` units (`794×1123px`) in the rendering pipeline — ensuring identical output regardless of device DPI or screen size.
+*   **v2.4 — Pricing Update (Feb 2026)**: Reduced base SQM rate from $0.80 to $0.75.
+*   **v2.3 — C-Flute Formula (Feb 2026)**: Updated blank sheet calculation for C-Flute with corrected formula.

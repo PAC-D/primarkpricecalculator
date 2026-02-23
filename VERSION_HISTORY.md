@@ -3,6 +3,21 @@
 
 ---
 
+## Version 2.5
+**Date:** February 23, 2026
+
+### Changes
+
+#### 1. PDF Export (pdf_export.html)
+- **Cross-Device Consistency Fix**: Resolved issue where exported PDFs looked different on different devices (desktop vs. mobile vs. tablet).
+  - **Root Cause**: The clone container and page element used `mm` units (e.g., `width: 210mm`) which browsers convert differently based on device DPI/pixel density — causing layout shifts on high-DPI mobile screens.
+  - **Fix**: Switched all sizing in the PDF generation pipeline to **fixed pixel values** (`794px × 1123px` — A4 at 96 DPI) instead of `mm` units.
+  - Padding changed from `20mm` to `57px` (pixel equivalent) for deterministic rendering.
+  - Off-screen container now positioned via `left: -894px` to avoid any visibility flicker.
+  - Image format uses JPEG at 98% quality for optimal file size.
+
+---
+
 ## Version 2.4
 **Date:** February 8, 2026
 

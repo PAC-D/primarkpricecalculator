@@ -279,7 +279,7 @@
             const element = document.getElementById('page');
             const status = document.getElementById('status-bar');
 
-            status.textContent = 'Generating PDF...';
+            status.textContent = 'Generating PDF... Please wait.';
 
             // Determine Filename
             let filename = 'PACD-Carton-Price.pdf';
@@ -299,38 +299,48 @@
             }
 
             // ========================================
-            // CLONE STRATEGY + FORCE EXACT DIMENSIONS
+            // CLONE STRATEGY — DEVICE-INDEPENDENT RENDERING
+            // Clones the page into a fixed 794px container, then uses
+            // html2canvas with explicit pixel dimensions to bypass device DPI.
             // ========================================
 
-            // Create a clean clone of the page element
+            // A4 dimensions in pixels at 96 DPI (device-independent)
+            const A4_W = 794;
+            const A4_H = 1123;
+
+            // Clone the page content
             const clone = element.cloneNode(true);
 
-            // Reset all transforms and styles to ensure print consistency
-            clone.style.transform = 'none';
-            clone.style.margin = '0';
-            clone.style.padding = '20mm'; // Increased padding for safety
-            clone.style.boxShadow = 'none';
-            clone.style.border = 'none';
-            clone.style.width = '210mm';           // Force exact A4 width
-            clone.style.minHeight = '297mm';       // Force exact A4 height
-            clone.style.height = 'auto';
-            clone.style.overflow = 'hidden';       // Clip any overflow to prevent blank pages
-            clone.style.position = 'relative';
-            clone.style.background = '#ffffff';
-            clone.style.boxSizing = 'border-box';
+            // Apply exact pixel sizing — NOT mm units (mm scale varies by device DPI)
+            clone.style.cssText = `
+                width: ${A4_W}px !important;
+                min-height: ${A4_H}px !important;
+                height: auto !important;
+                padding: 57px !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: #ffffff !important;
+                box-sizing: border-box !important;
+                position: relative !important;
+                overflow: hidden !important;
+                font-family: 'Inter', sans-serif !important;
+            `;
 
-            // Create an offscreen container to isolate from page CSS/zoom
+            // Off-screen container — fixed pixel width, far off screen
             const container = document.createElement('div');
-            container.style.position = 'fixed';
-            container.style.top = '0';
-            container.style.left = '0';
-            container.style.width = '210mm';       // Enforce exact A4 width
-            container.style.height = '297mm';      // Enforce exact A4 height
-            container.style.overflow = 'hidden';   // Clip overflow to prevent extra pages
-            container.style.background = '#ffffff';
-            container.style.zIndex = '-9999';      // Hide behind other content
-            container.style.margin = '0';
-            container.style.padding = '0';
+            container.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: -${A4_W + 100}px;
+                width: ${A4_W}px;
+                height: ${A4_H}px;
+                overflow: hidden;
+                background: #ffffff;
+                z-index: -9999;
+                margin: 0;
+                padding: 0;
+            `;
 
             container.appendChild(clone);
             document.body.appendChild(container);
@@ -341,19 +351,18 @@
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
-                    scale: 2,              // 2x resolution for crisp output
-                    useCORS: true,         // Allow cross-origin images
+                    scale: 2,              // 2x for crisp text
+                    useCORS: true,
+                    allowTaint: true,
                     scrollY: 0,
                     scrollX: 0,
                     x: 0,
                     y: 0,
-                    width: 794,            // Fixed A4 width in pixels (210mm at 96 DPI)
-                    height: 1123,          // Fixed A4 height in pixels (297mm at 96 DPI)
-                    windowWidth: 794,      // Force consistent viewport width
-                    windowHeight: 1123,    // Force consistent viewport height
-                    deviceScaleFactor: 1,  // Ignore device pixel ratio for consistent output
-                    letterRendering: 1,
-                    allowTaint: true
+                    width: A4_W,           // Fixed pixel width — device-independent
+                    height: A4_H,          // Fixed pixel height
+                    windowWidth: A4_W,     // Tell html2canvas the viewport is 794px
+                    windowHeight: A4_H,
+                    backgroundColor: '#ffffff'
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
@@ -365,25 +374,18 @@
                 // Remove any extra blank pages caused by sub-pixel overflow
                 const totalPages = pdf.internal.getNumberOfPages();
                 if (totalPages > 1) {
-                    // Delete pages backwards to avoid index shifting
                     for (let i = totalPages; i > 1; i--) {
                         pdf.deletePage(i);
                     }
                 }
             }).save().then(() => {
-                // Cleanup: Remove the offscreen container
-                if (document.body.contains(container)) {
-                    document.body.removeChild(container);
-                }
+                if (document.body.contains(container)) document.body.removeChild(container);
                 status.textContent = 'PDF Downloaded! You can now close this tab.';
                 status.style.background = '#10b981';
                 document.getElementById('download-btn').style.display = 'block';
             }).catch(err => {
                 console.error('PDF Generation Error:', err);
-                // Cleanup on error
-                if (document.body.contains(container)) {
-                    document.body.removeChild(container);
-                }
+                if (document.body.contains(container)) document.body.removeChild(container);
                 status.textContent = 'Error generating PDF. Please try manual download.';
                 status.style.background = '#e31837';
                 document.getElementById('download-btn').style.display = 'block';
@@ -513,7 +515,7 @@
             }
 
             // Trigger generation with a slight delay to ensure rendering
-            setTimeout(generatePDF, 800);
+            setTimeout(generatePDF, 500);
         };
     </script>
 </body>
